@@ -40,6 +40,6 @@ pub fn process_instruction(
         }
     };
  
-    DataX::process(program_id, &account, parsed_data);
+    Wavedata::process(program_id, &account, parsed_data);
     Ok(())
 }

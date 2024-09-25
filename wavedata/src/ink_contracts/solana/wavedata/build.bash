@@ -1,5 +1,5 @@
 #!/bin/sh
-cargo build-bpf --bpf-out-dir=../../dist
+cargo build-bpf --bpf-out-dir=../dist
 
 seedfile() {
    mkdir -p "$1"
