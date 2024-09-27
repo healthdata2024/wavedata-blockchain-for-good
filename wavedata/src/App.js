@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import DashboardLayout from "./components/DashboardLayout";
 import { DBProvider } from './contextx/DBContext';
+import { PolkadotProvider } from './contextx/PolkadotContext';
 import Login from "./pages/LogIn";
 import Register from "./pages/Register";
 import Payment from "./pages/Payment";
@@ -24,6 +25,7 @@ export default function App() {
 
   return (<>
     <DBProvider>
+    <PolkadotProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login />} />
@@ -76,6 +78,7 @@ export default function App() {
         </Routes>
       </BrowserRouter >
 
+    </PolkadotProvider>
     </DBProvider>
 
   </>

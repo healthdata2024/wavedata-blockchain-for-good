@@ -3,15 +3,16 @@ import { useNavigate, useLocation } from "react-router-dom";
 import {useState, useEffect} from "react";
 import logoicon from "../assets/wave-data-logo.svg";
 import {web3Enable, isWeb3Injected, web3Accounts} from "@polkadot/extension-dapp";
-import useContract from "../services/useContract";
+import {usePolkadotContext} from "../contextx/PolkadotContext.js";
 
 import "./Login.css";
 
 
 function Login() {
 	let navigate = useNavigate();
-	const {api, contract, signerAddress, sendTransaction, ReadContractByQuery, getMessage, getQuery} = useContract();
+	const {api, contract, signerAddress, sendTransaction, ReadContractByQuery, getMessage, getQuery} = usePolkadotContext();
 	const [isPolkadotConnected, setisPolkadotConnected] = useState(false);
+	const [isSolanaConnected, setisSolanaConnected] = useState(false);
 
 	window.onload = (e) => {
 		if (Cookies.get("login") ==="true") {
@@ -37,8 +38,17 @@ function Login() {
 				setisPolkadotConnected(false);
 			}
 		} else {
-			window.localStorage.setItem("type", "non-polkadot");
-			setisPolkadotConnected(true);
+			if (typeof window.solflare !== "undefined") {
+				await window.solflare.connect();
+				if (window.solflare.isConnected) {
+					window.localStorage.setItem("type", "solflare");
+					setisSolanaConnected(true);
+				} else {
+					setisSolanaConnected(false);
+				}
+			}else{
+				window.open("https://chromewebstore.google.com/detail/solflare-wallet/bhhhlbepdkbapadjdnnojkbgioiodbic","_about");
+			}
 		}
 	}
 
@@ -63,7 +73,7 @@ function Login() {
 			return;
 		}
 		try {
-			const result = await ReadContractByQuery(api, signerAddress, getQuery("CheckEmail"), [emailTXT.value]);
+			const result = await ReadContractByQuery( getQuery("CheckEmail"), [emailTXT.value]);
 
 			if (result?.toString() ==="False") {
 				FailedNotification.innerText = "Email is not valid";
@@ -72,7 +82,7 @@ function Login() {
 				LoadingICON.style.display = "none";
 				return;
 			}
-			let userid = await ReadContractByQuery(api, signerAddress, getQuery("Login"), [emailTXT.value, passwordTXT.value]);
+			let userid = await ReadContractByQuery( getQuery("Login"), [emailTXT.value, passwordTXT.value]);
 
 			if (userid !="False") {
 				LoadingICON.style.display = "none";
@@ -107,10 +117,10 @@ function Login() {
 			if (window.localStorage.getItem("type") === "polkadot") {
 				await web3Enable("WaveData");
 				setisPolkadotConnected(true);
-			} else {
-				setisPolkadotConnected(false);
+			} else if (window.localStorage.getItem("type") === "solflare") {
+				setisSolanaConnected(true);
 			}
-			if (isPolkadotConnected) {
+			if (isPolkadotConnected || isSolanaConnected) {
 				if (window.contract != null) {
 					LoadingICON.style.display = "none";
 					buttonTextBox.style.display = "block";
@@ -149,7 +159,7 @@ function Login() {
 							Password
 							<input type="password" id="password" name="password" className="mt-2 h-10 border border-gray-200 rounded-md outline-none px-2 focus:border-gray-400" />
 						</label>
-						{isPolkadotConnected ? (
+						{isPolkadotConnected || isSolanaConnected ? (
 							<>
 								<button
 									onClick={LoginClick}
@@ -171,11 +181,11 @@ function Login() {
 								</button>
 								<button
 									onClick={(e) => {
-										onClickConnect(0);
+										onClickConnect(2);
 									}}
-									className="bg-orange-500 text-white rounded-md shadow-md h-10 w-full mt-3 hover:bg-orange-600 transition-colors overflow:hidden flex content-center items-center justify-center cursor-pointer hidden"
+									className="bg-orange-500 text-white rounded-md shadow-md h-10 w-full mt-3 hover:bg-orange-600 transition-colors overflow:hidden flex content-center items-center justify-center cursor-pointer"
 								>
-									<span id="buttonText">Continue without Polkadot</span>
+									<span id="buttonText">Connect Solana</span>
 								</button>
 							</>
 						)}

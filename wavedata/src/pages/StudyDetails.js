@@ -5,7 +5,7 @@ import { formatDistance } from "date-fns";
 import Form from "react-bootstrap/Form";
 import "./StudyDetails.css";
 import CreateSurveyModal from "../components/modal/CrateSurvey.jsx";
-import useContract from "../services/useContract";
+import {usePolkadotContext} from "../contextx/PolkadotContext.js";
 import { useDBContext } from "../contextx/DBContext.js";
 
 import UpdateStudyModal from "../components/modal/UpdateStudy.jsx";
@@ -16,7 +16,7 @@ function StudyDetails() {
 	const params = useParams();
 	const navigate = useNavigate();
 	const {CreateSubject,UpdateSubject,base} = useDBContext();
-	const { api, contract, signerAddress, sendTransaction, ReadContractValue, ReadContractByQuery, getMessage, getQuery } = useContract();
+	const { api, contract, signerAddress, sendTransaction, ReadContractValue, ReadContractByQuery, getMessage, getQuery } = usePolkadotContext();;
 	const [tabIndex, setTabIndex] = useState(0);
 	const [UpdatemodalShow, setModalShow] = useState(false);
 	const [CreateSurveymodalShow, setSurveyModalShow] = useState(false);
@@ -102,7 +102,7 @@ function StudyDetails() {
 	};
 	async function UpdateAgesHandle(event) {
 		DisableButton("AgeSave");
-		await sendTransaction(api, signerAddress, "UpdateStudyAges", [Number(params.id), JSON.stringify(agesData)]);
+		await sendTransaction( "UpdateStudyAges", [Number(params.id), JSON.stringify(agesData)]);
 
 		EnableButton("AgeSave");
 	}
@@ -171,7 +171,7 @@ function StudyDetails() {
 	async function UpdateStudyTitleHandle() {
 		DisableButton("StudyTitleSave");
 		console.log("UpdateStudyTitleHandle");
-		await sendTransaction(api, signerAddress, "CreateOrSaveStudyTitle", [Number(params.id), JSON.stringify(studyTitle.ages_ans)]);
+		await sendTransaction( "CreateOrSaveStudyTitle", [Number(params.id), JSON.stringify(studyTitle.ages_ans)]);
 
 		EnableButton("StudyTitleSave");
 	}
@@ -190,7 +190,7 @@ function StudyDetails() {
 				Sex: element.Sex
 			});
 		});
-		await sendTransaction(api, signerAddress, "UpdateAudience", [parseInt(params.id), JSON.stringify(createdObject)]);
+		await sendTransaction( "UpdateAudience", [parseInt(params.id), JSON.stringify(createdObject)]);
 		EnableButton("audienceSave");
 
 	}
@@ -201,7 +201,7 @@ function StudyDetails() {
 		DisableButton("rewardsSave");
 
 		try {
-			await sendTransaction(api, signerAddress, "UpdateReward", [Number(parseInt(params.id)), rewardselect.value, (Number(rewardprice.value) * 1e18).toFixed(0), (parseInt(totalspendlimit.value)* 1e18).toFixed(0)]);
+			await sendTransaction( "UpdateReward", [Number(parseInt(params.id)), rewardselect.value, (Number(rewardprice.value) * 1e18).toFixed(0), (parseInt(totalspendlimit.value)* 1e18).toFixed(0)]);
 		} catch (error) {
 			console.error(error);
 		}
@@ -229,7 +229,7 @@ function StudyDetails() {
 
 		let allAudiences = [];
 		try {
-			allAudiences = JSON.parse(await ReadContractByQuery(api, signerAddress, getQuery("_studyAudienceMap"), [Number(params.id)]));
+			allAudiences = JSON.parse(await ReadContractByQuery( getQuery("_studyAudienceMap"), [Number(params.id)]));
 		} catch (e) {
 			allAudiences = [];
 		}
@@ -242,7 +242,7 @@ function StudyDetails() {
 
 		if (contract !== null && api !== null) {
 			setSTUDY_DATA({});
-			let study_element = await ReadContractByQuery(api, signerAddress, getQuery("_studyMap"), [Number(params.id)]);
+			let study_element = await ReadContractByQuery( getQuery("_studyMap"), [Number(params.id)]);
 
 
 			let allAges = [];
@@ -414,11 +414,11 @@ function StudyDetails() {
 				setLoadingSurvey(true);
 				let survey_data = []
 				setData([]);
-				const totalSurveys = await ReadContractByQuery(api, signerAddress, getQuery("_SurveyIds"));
+				const totalSurveys = await ReadContractByQuery( getQuery("_SurveyIds"));
 
 				try {
 					for (let i = 0; i < Number(totalSurveys); i++) {
-						let survey_element = await ReadContractByQuery(api, signerAddress, getQuery("_surveyMap"), [i]);
+						let survey_element = await ReadContractByQuery( getQuery("_surveyMap"), [i]);
 
 						var new_survey = {
 							id: Number(survey_element.surveyId),
@@ -456,12 +456,12 @@ function StudyDetails() {
 			setContributors([]);
 			let arr = [];
 
-			const totalOngoing = await ReadContractByQuery(api, signerAddress, getQuery("_OngoingIds"));
+			const totalOngoing = await ReadContractByQuery( getQuery("_OngoingIds"));
 
 			for (let i = 0; i < Number(totalOngoing); i++) {
-				let element = await ReadContractByQuery(api, signerAddress, getQuery("_ongoingMap"), [parseInt(i)]);
-				let user_element = await ReadContractByQuery(api, signerAddress, getQuery("getUserDetails"), [Number(element.userId)]);
-				let fhir_element = await ReadContractByQuery(api, signerAddress, getQuery("_fhirMap"), [Number(user_element[6])]);
+				let element = await ReadContractByQuery( getQuery("_ongoingMap"), [parseInt(i)]);
+				let user_element = await ReadContractByQuery( getQuery("getUserDetails"), [Number(element.userId)]);
+				let fhir_element = await ReadContractByQuery( getQuery("_fhirMap"), [Number(user_element[6])]);
 
 				if (Number(element.studyId) === parseInt(params.id)) {
 					arr.push({

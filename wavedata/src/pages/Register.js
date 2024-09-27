@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie'
 import logoicon from "../assets/wave-data-logo.svg";
 import { useState, useEffect } from 'react'
-import useContract from '../services/useContract'
+import {usePolkadotContext} from "../contextx/PolkadotContext.js";
 import { web3Enable, isWeb3Injected, web3Accounts } from "@polkadot/extension-dapp";
 import { useNavigate } from "react-router-dom";
 import './Register.css'
@@ -9,9 +9,10 @@ import './Register.css'
 
 function Register() {
     let navigate = useNavigate();
-    const { api, contract, signerAddress, sendTransaction, ReadContractValue, ReadContractByQuery, getMessage, getQuery, getTX } = useContract();
+    const { api, contract, signerAddress, sendTransaction, ReadContractValue, ReadContractByQuery, getMessage, getQuery, getTX } = usePolkadotContext();;
 
-    const [isPolkadotConnected, setisPolkadotConnected] = useState(false)
+    const [isPolkadotConnected, setisPolkadotConnected] = useState(false);
+	const [isSolanaConnected, setisSolanaConnected] = useState(false);
 
     function loginLink() {
         navigate("/login", { replace: true });
@@ -50,11 +51,11 @@ function Register() {
 
         try {
             if (contract !== null && api !== null) {
-                const result = await ReadContractByQuery(api, signerAddress, getQuery("CheckEmail"), [emailTXT.value])
+                const result = await ReadContractByQuery( getQuery("CheckEmail"), [emailTXT.value])
 
                 if (result === "False") {
 
-                    await sendTransaction(api, signerAddress, "CreateAccount", [FullNameTXT.value, emailTXT.value, passwordTXT.value, "", signerAddress,""]);
+                    await sendTransaction( "CreateAccount", [FullNameTXT.value, emailTXT.value, passwordTXT.value, "", signerAddress,""]);
                     SuccessNotification.style.display = "block";
                     window.location.href = "/login"
                 } else {
@@ -97,19 +98,28 @@ function Register() {
                 setisPolkadotConnected(false);
             }
         } else {
-            window.localStorage.setItem("type", "non-polkadot")
-            setisPolkadotConnected(true);
-        }
+			if (typeof window.solflare !== "undefined") {
+				await window.solflare.connect();
+				if (window.solflare.isConnected) {
+					window.localStorage.setItem("type", "solflare");
+					setisSolanaConnected(true);
+				} else {
+					setisSolanaConnected(false);
+				}
+			}else{
+				window.open("https://chromewebstore.google.com/detail/solflare-wallet/bhhhlbepdkbapadjdnnojkbgioiodbic","_about");
+			}
+		}
     }
     useEffect(() => {
         async function check() {
             if (window.localStorage.getItem("type") === "polkadot") {
-                await web3Enable("WaveData");
-                setisPolkadotConnected(true);
-            } else {
-                setisPolkadotConnected(false);
-            }
-
+				await web3Enable("WaveData");
+				setisPolkadotConnected(true);
+			} else if (window.localStorage.getItem("type") === "solflare") {
+				setisSolanaConnected(true);
+			}
+			
         }
 
         check();
@@ -146,18 +156,37 @@ function Register() {
                             Repeat password
                             <input type='password' id="confirm-password" name="confirm-password" required className="mt-2 h-10 border border-gray-200 rounded-md outline-none px-2 focus:border-gray-400" />
                         </label>
-                        {(isPolkadotConnected) ? (<>
-                            <button id='registerBTN' onClick={RegisterAcc} className="bg-orange-500 text-white rounded-md shadow-md h-10 w-full mt-3 hover:bg-orange-600 transition-colors overflow:hidden flex content-center items-center justify-center cursor-pointer">
-                                <i id='LoadingICON' style={{ display: "none" }} className="select-none block w-12 m-0 fa fa-circle-o-notch fa-spin"></i>
-                                <span id='buttonText'>Register</span>
-                            </button>
-
-                        </>) : (<>
-                            <button onClick={e=>{onClickConnect(1)}}  className="bg-orange-500 text-white rounded-md shadow-md h-10 w-full mt-3 hover:bg-orange-600 transition-colors overflow:hidden flex content-center items-center justify-center cursor-pointer">
-                                <span id='buttonText'>Connect Polkadot</span>
-                            </button>
-                         
-                        </>)}
+                        {isPolkadotConnected || isSolanaConnected ? (
+							<>
+								<button
+									onClick={RegisterAcc}
+                                    id ="registerBTN"
+									className={`bg-orange-500 text-white rounded-md shadow-md h-10 w-full mt-3 hover:bg-orange-600 transition-colors overflow:hidden flex content-center items-center justify-center cursor-pointer`}
+								>
+									<i id="LoadingICON" style={{display: "none"}} className="select-none block w-min m-0 fa fa-circle-o-notch fa-spin"></i>
+									<span id="buttonText">Register</span>
+								</button>
+							</>
+						) : (
+							<>
+								<button
+									onClick={(e) => {
+										onClickConnect(1);
+									}}
+									className="bg-orange-500 text-white rounded-md shadow-md h-10 w-full mt-3 hover:bg-orange-600 transition-colors overflow:hidden flex content-center items-center justify-center cursor-pointer"
+								>
+									<span id="buttonText">Connect Polkadot</span>
+								</button>
+								<button
+									onClick={(e) => {
+										onClickConnect(2);
+									}}
+									className="bg-orange-500 text-white rounded-md shadow-md h-10 w-full mt-3 hover:bg-orange-600 transition-colors overflow:hidden flex content-center items-center justify-center cursor-pointer"
+								>
+									<span id="buttonText">Connect Solana</span>
+								</button>
+							</>
+						)}
                         <button onClick={loginLink} className="bg-gray-200 text-gray-500 rounded-md shadow-md h-10 w-full mt-3 hover:bg-black hover:text-white transition-colors">
                             Login
                         </button>

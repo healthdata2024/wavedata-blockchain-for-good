@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { CurrencyDollarIcon } from "@heroicons/react/solid";
 import Cookies from 'js-cookie';
-import useContract from '../../services/useContract'
+import {usePolkadotContext} from "../../contextx/PolkadotContext.js";
 
 export default function CreateSurveyModal({
     show,
@@ -13,7 +13,7 @@ export default function CreateSurveyModal({
 
 }) {
   
-    const {  api,contract, signerAddress, sendTransaction,ReadContractValue,ReadContractByQuery,getMessage,getQuery,getTX } = useContract();
+    const {  api,contract, signerAddress, sendTransaction,ReadContractValue,ReadContractByQuery,getMessage,getQuery,getTX } = usePolkadotContext();;
  
 
  
@@ -28,7 +28,7 @@ export default function CreateSurveyModal({
         surveyBTN.children[1].innerText = ""
         surveyBTN.disabled = true;
         try {
-            await sendTransaction(api,signerAddress, "CreateSurvey",[Number(Studyid),Cookies.get("userid"),name.value,description.value,d,image.value, (Number(reward.value) * 1e18).toFixed(0)],(Number(reward.value) * 1e18).toFixed(0));
+            await sendTransaction( "CreateSurvey",[Number(Studyid),Cookies.get("userid"),name.value,description.value,d,image.value, (Number(reward.value) * 1e18).toFixed(0)],(Number(reward.value) * 1e18).toFixed(0));
             
             notificationSuccess.style.display = "block";
             surveyBTN.children[0].classList.add("hidden")

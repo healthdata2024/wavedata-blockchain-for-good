@@ -1,16 +1,16 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import useContract from "../../services/useContract";
+import {usePolkadotContext} from "../../contextx/PolkadotContext.js";
 function ResetAll() {
 	let navigate = useNavigate();
-	const {api, contract, signerAddress, sendTransaction, ReadContractValue, ReadContractByQuery, getMessage, getQuery} = useContract();
+	const {api, contract, signerAddress, sendTransaction, ReadContractValue, ReadContractByQuery, getMessage, getQuery} = usePolkadotContext();;
 
 	async function ResetClick(event) {
 
 
 			
 		event.target.disabled = true;
-		await sendTransaction(api,signerAddress, "reset_all");
+		await sendTransaction( "reset_all");
 		window.location.href = "/";
 
 		event.target.disabled = false;
@@ -20,7 +20,7 @@ function ResetAll() {
 		event.target.disabled = true;
       var UserIdTXT = document.getElementById("userid")
 
-	  await sendTransaction(api,signerAddress, "reset_app",[Number(UserIdTXT.value)]);
+	  await sendTransaction( "reset_app",[Number(UserIdTXT.value)]);
 		window.location.href = "/";
 
 		event.target.disabled = false;

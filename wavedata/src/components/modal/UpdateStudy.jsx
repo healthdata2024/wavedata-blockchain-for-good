@@ -3,14 +3,14 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { CurrencyDollarIcon } from "@heroicons/react/solid";
-import useContract from '../../services/useContract'
+import {usePolkadotContext} from "../../contextx/PolkadotContext.js";
 
 export default function UpdateStudyModal({
     show,
     onHide,
     id
 }) {
-    const {  api,contract, signerAddress, sendTransaction,ReadContractValue,ReadContractByQuery,getMessage,getQuery,getTX } = useContract();
+    const {  api,contract, signerAddress, sendTransaction,ReadContractValue,ReadContractByQuery,getMessage,getQuery,getTX } = usePolkadotContext();;
  
 
    
@@ -24,7 +24,7 @@ export default function UpdateStudyModal({
         updateBTN.disabled = true;
 
         try {
-            await sendTransaction(api,signerAddress, "UpdateStudy",[Number(id),image.value,title.value,description.value, (parseInt(budget.value) * 1e18).toFixed(0)]);
+            await sendTransaction( "UpdateStudy",[Number(id),image.value,title.value,description.value, (parseInt(budget.value) * 1e18).toFixed(0)]);
             
             notificationSuccess.style.display = "block";
             updateBTN.children[0].classList.add("hidden")
@@ -48,7 +48,7 @@ export default function UpdateStudyModal({
     async function LoadData() {
         if (typeof window?.contract !== 'undefined' && api !== null) {
             try {
-                let study_element = await ReadContractByQuery(api, signerAddress, getQuery("_studyMap"), [parseInt(id)]);
+                let study_element = await ReadContractByQuery( getQuery("_studyMap"), [parseInt(id)]);
                 var newStudy = {
                     id: Number(study_element.studyId),
                     title: study_element.title,

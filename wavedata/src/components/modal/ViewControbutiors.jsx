@@ -6,12 +6,12 @@ import {Bar} from "react-chartjs-2";
 import {Chart as ChartJS, BarElement, CategoryScale, LinearScale, PointElement, Tooltip} from "chart.js";
 import GraphChartLine from "../Card/graphChartLine";
 import GraphChartBar from "../Card/graphChartBar";
-import useContract from "../../services/useContract";
+import {usePolkadotContext} from "../../contextx/PolkadotContext.js";
 
 
 export default function ViewControbutiors({show,setShow, onHide, id}) {
 	ChartJS.register(BarElement, CategoryScale, LinearScale, PointElement, Tooltip);
-	const {  api,contract, signerAddress, sendTransaction,ReadContractValue,ReadContractByQuery,getMessage,getQuery,getTX } = useContract();
+	const {  api,contract, signerAddress, sendTransaction,ReadContractValue,ReadContractByQuery,getMessage,getQuery,getTX } = usePolkadotContext();;
 
 	const [contributor, setContributor] = useState({});
 	const [FHIRS_COLSAll, setFHIRS_COLSAll] = useState([]);
@@ -22,9 +22,9 @@ export default function ViewControbutiors({show,setShow, onHide, id}) {
 
 	async function LoadData() {
 		if (typeof window?.contract !== "undefined" && api !== null) {
-			let element = await ReadContractByQuery(api,signerAddress, getQuery("_ongoingMap"),[Number(id)])
-			let user_element = await ReadContractByQuery(api,signerAddress, getQuery("getUserDetails"),[Number(element.userId)])			
-			let fhir_element = await ReadContractByQuery(api, signerAddress, getQuery("_fhirMap"), [Number(user_element[6])]);
+			let element = await ReadContractByQuery( getQuery("_ongoingMap"),[Number(id)])
+			let user_element = await ReadContractByQuery( getQuery("getUserDetails"),[Number(element.userId)])			
+			let fhir_element = await ReadContractByQuery( getQuery("_fhirMap"), [Number(user_element[6])]);
 
 			let given_permission = eval("(" + element.givenPermission + ")");
 			let FHIRS_COLS = [];

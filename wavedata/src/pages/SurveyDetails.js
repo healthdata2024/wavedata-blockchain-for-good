@@ -4,7 +4,7 @@ import React from "react";
 import Select from "react-select";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { PlusSmIcon, ChevronRightIcon, PencilIcon, TrashIcon, PlusIcon, DocumentDuplicateIcon } from "@heroicons/react/solid";
-import useContract from "../services/useContract";
+import {usePolkadotContext} from "../contextx/PolkadotContext.js";
 import UpdateSurveyModal from "../components/modal/UpdateSurvey";
 
 import "./SurveyDetails.css";
@@ -13,7 +13,7 @@ function SurveyDetails() {
 		sectionsloaded: false,
 		data: []
 	};
-	const { api, contract, signerAddress, sendTransaction, ReadContractValue, ReadContractByQuery, getMessage, getQuery } = useContract();
+	const { api, contract, signerAddress, sendTransaction, ReadContractValue, ReadContractByQuery, getMessage, getQuery } = usePolkadotContext();;
 	const params = useParams();
 	const navigate = useNavigate();
 	let location = useLocation();
@@ -81,7 +81,7 @@ function SurveyDetails() {
 		BTN.classList.remove("cursor-pointer");
 		var categoryname = document.getElementsByName("categoryName")[index];
 		var categoryimagelink = document.getElementsByName("imagelink")[index];
-		await sendTransaction(api, signerAddress, "CreateSurveyCategory", [categoryname.value, categoryimagelink.value]);
+		await sendTransaction( "CreateSurveyCategory", [categoryname.value, categoryimagelink.value]);
 		setdataCategory((prevState) => [
 			...prevState,
 			{
@@ -177,7 +177,7 @@ function SurveyDetails() {
 		SaveBTN.classList.add("cursor-default");
 		SaveBTN.disabled = true;
 		try {
-			await sendTransaction(api, signerAddress, "CreateOrSaveSections", [SURVEY_DATA.id, JSON.stringify(sectionsdata)]);
+			await sendTransaction( "CreateOrSaveSections", [SURVEY_DATA.id, JSON.stringify(sectionsdata)]);
 		} catch (error) {
 
 		}
@@ -194,7 +194,7 @@ function SurveyDetails() {
 
 			setstatus("loading...");
 
-			let study_element = await ReadContractByQuery(api, signerAddress, getQuery("_studyMap"), [parseInt(location.state.studyID)]);
+			let study_element = await ReadContractByQuery( getQuery("_studyMap"), [parseInt(location.state.studyID)]);
 			var newStudy = {
 				id: Number(study_element.studyId),
 				title: study_element.title,
@@ -215,7 +215,7 @@ function SurveyDetails() {
 		if (contract !== null && api !== null) {
 			setstatus("loading...");
 
-			let survey_element = await ReadContractByQuery(api, signerAddress, getQuery("_surveyMap"), [parseInt(params.id)]);
+			let survey_element = await ReadContractByQuery( getQuery("_surveyMap"), [parseInt(params.id)]);
 			var new_survey = {
 				id: Number(survey_element.surveyId),
 				study_id: Number(survey_element.studyId),
@@ -241,7 +241,7 @@ function SurveyDetails() {
 			sleep(100);
 
 			try {
-				let SectionsInfo =  JSON.parse(await ReadContractByQuery(api, signerAddress, getQuery("_sectionsMap"), [parseInt(0)]));
+				let SectionsInfo =  JSON.parse(await ReadContractByQuery( getQuery("_sectionsMap"), [parseInt(0)]));
 				setsectionsdata(SectionsInfo);
 			} catch (error) { }
 
@@ -255,10 +255,10 @@ function SurveyDetails() {
 				setdataCategory([]);
 				sleep(100);
 				
-			const totalSurveyCategory = await ReadContractByQuery(api,signerAddress, getQuery("_SurveyCategoryIds"))    
+			const totalSurveyCategory = await ReadContractByQuery( getQuery("_SurveyCategoryIds"))    
 		
 				for (let i = 0; i < Number(totalSurveyCategory); i++) {
-					const element = await ReadContractByQuery(api, signerAddress, getQuery("_categoryMap"), [parseInt(i)]);
+					const element = await ReadContractByQuery( getQuery("_categoryMap"), [parseInt(i)]);
 					setdataCategory((prevState) => [
 						...prevState,
 						{

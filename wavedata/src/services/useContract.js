@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 
 import { ApiPromise, Keyring, WsProvider } from "@polkadot/api";
 import { options } from "@astar-network/astar-api";
-import { getDecodedOutput } from "./helpers";
+import { getDecodedOutput } from "../contextx/polkadot/helpers";
 
-import getContract from "./getContract";
+import getContract from "../contextx/polkadot/getContract";
 import { web3Enable, isWeb3Injected, web3Accounts } from "@polkadot/extension-dapp";
 
 
@@ -69,7 +69,7 @@ export default function useContract() {
 	}, []);
 
 
-	async function sendTransaction(api, signerAddress, method, args = [],value=0) {
+	async function sendTransaction( method, args = [],value=0) {
 		let tx = getTX(method);
 		let query = getQuery(method);
 		let gasLimit;
@@ -117,7 +117,7 @@ export default function useContract() {
 		return decodedOutput;
 	}
 
-	async function ReadContractByQuery(api, signerAddress, query, args = null) {
+	async function ReadContractByQuery( api, signerAddress,query, args = null) {
 		if (api === null) return;
 		if (args) {
 			const { gasRequired, result, output } = await query(

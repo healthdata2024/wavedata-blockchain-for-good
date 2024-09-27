@@ -2,7 +2,7 @@ import { PlusSmIcon, ArrowRightIcon, UserIcon, CurrencyDollarIcon, GlobeAltIcon 
 import { useEffect, useState } from "react";
 import CreateStudyModal from "../components/modal/CreateStudy.jsx";
 import { useDBContext } from '../contextx/DBContext.js'
-import useContract from "../services/useContract";
+import {usePolkadotContext} from "../contextx/PolkadotContext.js";
 import "./Study.css";
 
 let isLoadingData = false;
@@ -10,7 +10,7 @@ function Studies() {
 	const [data, setData] = useState([]);
 	const [CreatemodalShow, setModalShow] = useState(false);
 	const [Loading, setLoading] = useState(true);
-	const {  api,contract, signerAddress, ReadContractValue,ReadContractByQuery,getMessage,getQuery } = useContract();
+	const {  api,contract, signerAddress, ReadContractValue,ReadContractByQuery,getMessage,getQuery } = usePolkadotContext();;
 	const { base } = useDBContext();
 	const addStudy = () => {
 		setModalShow(true);
@@ -26,14 +26,14 @@ function Studies() {
 			isLoadingData = true;
 			setLoading(true);
 
-			const totalStudys = await ReadContractByQuery(api,signerAddress, getQuery("_StudyIds"))
+			const totalStudys = await ReadContractByQuery( getQuery("_StudyIds"))
     
 			let arr = [];
 			for (let i = 0; i < Number(totalStudys); i++) {
-				let study_element = await ReadContractByQuery(api,signerAddress, getQuery("_studyMap"),[i])
+				let study_element = await ReadContractByQuery( getQuery("_studyMap"),[i])
 				let allAudiences = [];
 				try {
-					allAudiences = JSON.parse( await ReadContractByQuery(api,signerAddress, getQuery("_studyAudienceMap"),[i]) );
+					allAudiences = JSON.parse( await ReadContractByQuery( getQuery("_studyAudienceMap"),[i]) );
 				} catch (e) {}
 				var newStudy = {
 					id: Number(study_element.studyId),

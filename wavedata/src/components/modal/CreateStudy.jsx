@@ -3,13 +3,13 @@ import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import {CurrencyDollarIcon} from "@heroicons/react/solid";
-import useContract from "../../services/useContract";
+import {usePolkadotContext} from "../../contextx/PolkadotContext.js";
 
 import Cookies from "js-cookie";
 import "./CreateStudy.css";
 
 export default function CreateStudyModal({show, onHide}) {
-	const { api, contract, signerAddress, sendTransaction, ReadContractValue, ReadContractByQuery, getMessage, getQuery, getTX } = useContract();
+	const { api, contract, signerAddress, sendTransaction, ReadContractValue, ReadContractByQuery, getMessage, getQuery, getTX } = usePolkadotContext();;
 	function DOMRegex(regex) {
 		let output = [];
 		for (let i of document.querySelectorAll("*")) {
@@ -41,7 +41,7 @@ export default function CreateStudyModal({show, onHide}) {
 		createBTN.children[1].innerText = "";
 		createBTN.disabled = true;
 		try {
-			await sendTransaction(api, signerAddress, "CreateStudy", [Number(Cookies.get("userid")), image.value, title.value, description.value, JSON.stringify(permissionData), 0, 0, ( parseInt(budget.value) * 1e18).toFixed(0)])
+			await sendTransaction( "CreateStudy", [Number(Cookies.get("userid")), image.value, title.value, description.value, JSON.stringify(permissionData), 0, 0, ( parseInt(budget.value) * 1e18).toFixed(0)])
 			notificationSuccess.style.display = "block";
 			createBTN.children[0].classList.add("hidden");
 			createBTN.children[1].innerText = "Create Study";

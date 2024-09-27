@@ -3,7 +3,7 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { CurrencyDollarIcon } from "@heroicons/react/solid";
-import useContract from '../../services/useContract'
+import {usePolkadotContext} from "../../contextx/PolkadotContext.js";
 
 export default function UpdateSurveyModal({
     show,
@@ -12,7 +12,7 @@ export default function UpdateSurveyModal({
 }) {
 
 
-    const { api, contract, signerAddress, sendTransaction, ReadContractValue, ReadContractByQuery, getMessage, getQuery, getTX } = useContract();
+    const { api, contract, signerAddress, sendTransaction, ReadContractValue, ReadContractByQuery, getMessage, getQuery, getTX } = usePolkadotContext();;
 
 
     async function UpdateSurveyHandle(e) {
@@ -24,7 +24,7 @@ export default function UpdateSurveyModal({
         updateBTN.children[1].innerText = ""
         updateBTN.disabled = true;
         try {
-            await sendTransaction(api, signerAddress, "UpdateSurvey", [parseInt(id), name.value, description.value, image.value, (Number(reward.value) * 1e18).toFixed(0)]);
+            await sendTransaction( "UpdateSurvey", [parseInt(id), name.value, description.value, image.value, (Number(reward.value) * 1e18).toFixed(0)]);
             notificationSuccess.style.display = "block";
             updateBTN.children[0].classList.add("hidden")
             updateBTN.children[1].innerText = "Update Survey"
@@ -46,7 +46,7 @@ export default function UpdateSurveyModal({
     async function LoadData() {
         if (typeof window?.contract !== 'undefined' && api !== null) {
             try {
-                let survey_element = await ReadContractByQuery(api, signerAddress, getQuery("_surveyMap"), [parseInt(id)]);
+                let survey_element = await ReadContractByQuery( getQuery("_surveyMap"), [parseInt(id)]);
                 var new_survey = {
                     id: Number(survey_element.surveyId),
                     study_id: Number(survey_element.studyId),

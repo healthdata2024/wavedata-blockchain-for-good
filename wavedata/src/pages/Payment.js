@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import useContract from "../services/useContract";
+import {usePolkadotContext} from "../contextx/PolkadotContext.js";
 import Cookies from 'js-cookie'
 function Payment() {
 	const [tabIndex, setTabIndex] = useState(0);
 	const [privatekey, setprivatekey] = useState("");
-	const {  api,contract, signerAddress, sendTransaction,ReadContractValue,ReadContractByQuery,getMessage,getQuery,getTX } = useContract();
+	const {  api,contract, signerAddress, sendTransaction,ReadContractValue,ReadContractByQuery,getMessage,getQuery,getTX } = usePolkadotContext();;
  
 	const TABS = [
 		{
@@ -23,7 +23,7 @@ function Payment() {
 	async function fetchData() {
 		if (contract) {
 			let userid = Cookies.get("userid");
-			let userdetails = await ReadContractByQuery(api,signerAddress, getQuery("getUserDetails"),[Number(userid)]);
+			let userdetails = await ReadContractByQuery( getQuery("getUserDetails"),[Number(userid)]);
 			setprivatekey(userdetails[4].substring(0,10) + "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
 		}
 	}
@@ -51,7 +51,7 @@ function Payment() {
 		try {
 			let userid = Cookies.get("userid");
 		 
-			// await sendTransaction(api,signerAddress, "UpdatePrivatekey",[parseInt(userid), privatekey.value]);
+			// await sendTransaction( "UpdatePrivatekey",[parseInt(userid), privatekey.value]);
 			  
 			SaveBTN.children[0].classList.add("hidden")
 			SaveBTN.children[1].innerText = "Save"
