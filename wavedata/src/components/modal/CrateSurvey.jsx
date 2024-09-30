@@ -4,7 +4,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { CurrencyDollarIcon } from "@heroicons/react/solid";
 import Cookies from 'js-cookie';
-import {usePolkadotContext} from "../../contextx/PolkadotContext.js";
+import {useMixedContext} from "../../contextx/MixedContext.js";
 
 export default function CreateSurveyModal({
     show,
@@ -13,7 +13,7 @@ export default function CreateSurveyModal({
 
 }) {
   
-    const {  api,contract, signerAddress, sendTransaction,ReadContractValue,ReadContractByQuery,getMessage,getQuery,getTX } = usePolkadotContext();;
+    const {  api,contract, signerAddress, sendTransaction,ReadContractByQuery,getMessage,getQuery,getTX } = useMixedContext();;
  
 
  

@@ -9,6 +9,8 @@ import {
 } from "react-router-dom";
 import DashboardLayout from "./components/DashboardLayout";
 import { DBProvider } from './contextx/DBContext';
+import { MixedProvider } from './contextx/MixedContext';
+import { SolanaProvider } from './contextx/SolanaContext';
 import { PolkadotProvider } from './contextx/PolkadotContext';
 import Login from "./pages/LogIn";
 import Register from "./pages/Register";
@@ -26,6 +28,9 @@ export default function App() {
   return (<>
     <DBProvider>
     <PolkadotProvider>
+    <SolanaProvider>
+    <MixedProvider>
+      
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login />} />
@@ -78,6 +83,8 @@ export default function App() {
         </Routes>
       </BrowserRouter >
 
+      </MixedProvider>
+    </SolanaProvider>
     </PolkadotProvider>
     </DBProvider>
 

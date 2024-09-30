@@ -2,7 +2,7 @@ import { PlusSmIcon, ArrowRightIcon, UserIcon, CurrencyDollarIcon, GlobeAltIcon 
 import { useEffect, useState } from "react";
 import CreateStudyModal from "../components/modal/CreateStudy.jsx";
 import { useDBContext } from '../contextx/DBContext.js'
-import {usePolkadotContext} from "../contextx/PolkadotContext.js";
+import {useMixedContext} from "../contextx/MixedContext.js";
 import "./Study.css";
 
 let isLoadingData = false;
@@ -10,7 +10,7 @@ function Studies() {
 	const [data, setData] = useState([]);
 	const [CreatemodalShow, setModalShow] = useState(false);
 	const [Loading, setLoading] = useState(true);
-	const {  api,contract, signerAddress, ReadContractValue,ReadContractByQuery,getMessage,getQuery } = usePolkadotContext();;
+	const {  api,contract, signerAddress, ReadContractByQuery,getMessage,getQuery } = useMixedContext();;
 	const { base } = useDBContext();
 	const addStudy = () => {
 		setModalShow(true);

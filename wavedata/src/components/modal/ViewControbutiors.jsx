@@ -6,12 +6,12 @@ import {Bar} from "react-chartjs-2";
 import {Chart as ChartJS, BarElement, CategoryScale, LinearScale, PointElement, Tooltip} from "chart.js";
 import GraphChartLine from "../Card/graphChartLine";
 import GraphChartBar from "../Card/graphChartBar";
-import {usePolkadotContext} from "../../contextx/PolkadotContext.js";
+import {useMixedContext} from "../../contextx/MixedContext.js";
 
 
 export default function ViewControbutiors({show,setShow, onHide, id}) {
 	ChartJS.register(BarElement, CategoryScale, LinearScale, PointElement, Tooltip);
-	const {  api,contract, signerAddress, sendTransaction,ReadContractValue,ReadContractByQuery,getMessage,getQuery,getTX } = usePolkadotContext();;
+	const {  api,contract, signerAddress, sendTransaction,ReadContractByQuery,getMessage,getQuery,getTX } = useMixedContext();;
 
 	const [contributor, setContributor] = useState({});
 	const [FHIRS_COLSAll, setFHIRS_COLSAll] = useState([]);

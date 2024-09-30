@@ -1,9 +1,9 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import {usePolkadotContext} from "../../contextx/PolkadotContext.js";
+import {useMixedContext} from "../../contextx/MixedContext.js";
 function ResetAll() {
 	let navigate = useNavigate();
-	const {api, contract, signerAddress, sendTransaction, ReadContractValue, ReadContractByQuery, getMessage, getQuery} = usePolkadotContext();;
+	const {api, contract, signerAddress, sendTransaction,  ReadContractByQuery, getMessage, getQuery} = useMixedContext();;
 
 	async function ResetClick(event) {
 

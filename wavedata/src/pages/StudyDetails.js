@@ -5,18 +5,17 @@ import { formatDistance } from "date-fns";
 import Form from "react-bootstrap/Form";
 import "./StudyDetails.css";
 import CreateSurveyModal from "../components/modal/CrateSurvey.jsx";
-import {usePolkadotContext} from "../contextx/PolkadotContext.js";
+import {useMixedContext} from "../contextx/MixedContext.js";
 import { useDBContext } from "../contextx/DBContext.js";
 
 import UpdateStudyModal from "../components/modal/UpdateStudy.jsx";
-import ViewControbutiors from "../components/modal/ViewControbutiors.jsx";
 
 function StudyDetails() {
 
 	const params = useParams();
 	const navigate = useNavigate();
 	const {CreateSubject,UpdateSubject,base} = useDBContext();
-	const { api, contract, signerAddress, sendTransaction, ReadContractValue, ReadContractByQuery, getMessage, getQuery } = usePolkadotContext();;
+	const { api, contract, signerAddress, sendTransaction,  ReadContractByQuery, getMessage, getQuery } = useMixedContext();;
 	const [tabIndex, setTabIndex] = useState(0);
 	const [UpdatemodalShow, setModalShow] = useState(false);
 	const [CreateSurveymodalShow, setSurveyModalShow] = useState(false);

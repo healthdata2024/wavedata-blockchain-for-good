@@ -3,13 +3,13 @@ import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import {CurrencyDollarIcon} from "@heroicons/react/solid";
-import {usePolkadotContext} from "../../contextx/PolkadotContext.js";
+import {useMixedContext} from "../../contextx/MixedContext.js";
 
 import Cookies from "js-cookie";
 import "./CreateStudy.css";
 
 export default function CreateStudyModal({show, onHide}) {
-	const { api, contract, signerAddress, sendTransaction, ReadContractValue, ReadContractByQuery, getMessage, getQuery, getTX } = usePolkadotContext();;
+	const { api, contract, signerAddress, sendTransaction,  ReadContractByQuery, getMessage, getQuery, getTX } = useMixedContext();;
 	function DOMRegex(regex) {
 		let output = [];
 		for (let i of document.querySelectorAll("*")) {

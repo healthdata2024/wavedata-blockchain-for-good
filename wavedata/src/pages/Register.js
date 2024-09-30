@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie'
 import logoicon from "../assets/wave-data-logo.svg";
 import { useState, useEffect } from 'react'
-import {usePolkadotContext} from "../contextx/PolkadotContext.js";
+import {useMixedContext} from "../contextx/MixedContext.js";
 import { web3Enable, isWeb3Injected, web3Accounts } from "@polkadot/extension-dapp";
 import { useNavigate } from "react-router-dom";
 import './Register.css'
@@ -9,7 +9,7 @@ import './Register.css'
 
 function Register() {
     let navigate = useNavigate();
-    const { api, contract, signerAddress, sendTransaction, ReadContractValue, ReadContractByQuery, getMessage, getQuery, getTX } = usePolkadotContext();;
+    const { api, contract, signerAddress, sendTransaction,  ReadContractByQuery, getMessage, getQuery, getTX } = useMixedContext();;
 
     const [isPolkadotConnected, setisPolkadotConnected] = useState(false);
 	const [isSolanaConnected, setisSolanaConnected] = useState(false);

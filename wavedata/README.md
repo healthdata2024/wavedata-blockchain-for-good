@@ -23,4 +23,4 @@ With the WaveData marketplace the organizer can create their studys and surveys 
 
 WaveData helps each user and organizer to keep touch everyday. On WaveData the organizer can check how many people have contributed and what their answers are. WaveData provides chart analysis options for the organizer to keep updated with better understanding.
 
-For wavedata, we are using Tron to store user's details, study details, Rewards details (for each Study), Survey, Audiences, Contributors and retirieving those in our website.
+For wavedata, we are using blockchain to store user's details, study details, Rewards details (for each Study), Survey, Audiences, Contributors and retirieving those in our website.

@@ -3,14 +3,14 @@ import { useNavigate, useLocation } from "react-router-dom";
 import {useState, useEffect} from "react";
 import logoicon from "../assets/wave-data-logo.svg";
 import {web3Enable, isWeb3Injected, web3Accounts} from "@polkadot/extension-dapp";
-import {usePolkadotContext} from "../contextx/PolkadotContext.js";
+import {useMixedContext} from "../contextx/MixedContext.js";
 
 import "./Login.css";
 
 
 function Login() {
 	let navigate = useNavigate();
-	const {api, contract, signerAddress, sendTransaction, ReadContractByQuery, getMessage, getQuery} = usePolkadotContext();
+	const {api, contract, signerAddress, sendTransaction, ReadContractByQuery, getMessage, getQuery} = useMixedContext();
 	const [isPolkadotConnected, setisPolkadotConnected] = useState(false);
 	const [isSolanaConnected, setisSolanaConnected] = useState(false);
 

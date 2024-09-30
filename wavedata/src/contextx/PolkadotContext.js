@@ -17,11 +17,10 @@ const AppContext = createContext({
     api: null,
     signerAddress: null,
     contract: false,
-    sendTransaction: async (api, signerAddress, method, args = [], value = 0) => { },
-    ReadContractByQuery: async (api, signerAddress, query, args = null) => { },
-    ReadContractValue: async (api, signerAddress, msg, msgWithArgs) => { },
+    sendTransaction: async (method, args = [], value = 0) => { },
+    ReadContractByQuery: async (query, args = null) => { },
     getMessage: async (find_contract) => { },
-    getQuery: async (find_contract) => { },
+    getQuery:  (find_contract) => { },
     getTX: async (find_contract) => { },
     currentChain: null,
 
@@ -74,13 +73,6 @@ export function PolkadotProvider({ children }) {
 
     }
 
-    async function ReadContractValue( msg, msgWithArgs) {
-        const result = await api.call.contractsApi.call(signerAddress, CONTRACT_ADDRESS, 0, null, null, msg.toU8a(msgWithArgs));
-
-        const decodedOutput = getDecodedOutput(result, msg, api.registry).decodedOutput;
-
-        return decodedOutput;
-    }
 
     async function ReadContractByQuery( query, args = null) {
         if (api === null) return;
@@ -103,28 +95,28 @@ export function PolkadotProvider({ children }) {
         }
     }
     function getMessage(find_contract) {
-        for (let i = 0; i < window.contract.abi.messages.length; i++) {
-            if (find_contract == window.contract.abi.messages[i]["identifier"]) {
-                return window.contract.abi.messages[i];
+        for (let i = 0; i < contract.abi.messages.length; i++) {
+            if (find_contract == contract.abi.messages[i]["identifier"]) {
+                return contract.abi.messages[i];
             }
         }
     }
 
     function getQuery(find_contract) {
         let messageName = "";
-        for (let i = 0; i < window.contract.abi.messages.length; i++) {
-            if (find_contract == window.contract.abi.messages[i]["identifier"]) {
-                messageName = window.contract.abi.messages[i]["method"];
-                return window.contract.query[messageName];
+        for (let i = 0; i < contract.abi.messages.length; i++) {
+            if (find_contract == contract.abi.messages[i]["identifier"]) {
+                messageName = contract.abi.messages[i]["method"];
+                return contract.query[messageName];
             }
         }
     }
     function getTX(find_contract) {
         let messageName = "";
-        for (let i = 0; i < window.contract.abi.messages.length; i++) {
-            if (find_contract == window.contract.abi.messages[i]["identifier"]) {
-                messageName = window.contract.abi.messages[i]["method"];
-                return window.contract.tx[messageName];
+        for (let i = 0; i < contract.abi.messages.length; i++) {
+            if (find_contract == contract.abi.messages[i]["identifier"]) {
+                messageName = contract.abi.messages[i]["method"];
+                return contract.tx[messageName];
             }
         }
     }
@@ -166,7 +158,6 @@ export function PolkadotProvider({ children }) {
         contract: contract,
         sendTransaction: sendTransaction,
         ReadContractByQuery: ReadContractByQuery,
-        ReadContractValue: ReadContractValue,
         getMessage: getMessage,
         getQuery: getQuery,
         getTX: getTX

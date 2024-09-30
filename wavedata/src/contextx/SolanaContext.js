@@ -2,220 +2,229 @@
 import { useContext, useEffect, useState } from 'react';
 import { createContext } from 'react';
 import {
-    establishConnection,
-    checkProgram,
-    InitializeState,
-    getOutput,
-    UpdateOrInsertData,
-    CreateNewPDA
-} from './solana/client/datax.mjs';
+	establishConnection,
+	checkProgram,
+	InitializeState,
+	getOutput,
+	UpdateOrInsertData,
+	CreateNewPDA
+} from './solana/client/wavedata.mjs';
 
 
 const AppContext = createContext({
-    solanaSignerAddress: '',
-    InitContract: false,
-    sendTransaction: async () => { },
-    ReadContract: async () => { },
+	sol_api: null,
+	sol_signerAddress: null,
+	sol_contract: false,
+	sol_sendTransaction: async (method, args = [], value = 0) => { },
+	sol_ReadContractByQuery: async (query, args = null) => { },
+	sol_getMessage: async (find_contract) => { },
+	sol_getQuery:  (find_contract) => { return find_contract;},
+	sol_getTX: async (find_contract) => { },
+	sol_currentChain: null,
 
 });
 
 
 export function SolanaProvider({ children }) {
-    const [solanaSignerAddress, setSignerAddress] = useState('');
-    const [InitContract, setInitContract] = useState(false);
+	const [signerAddress, setSignerAddress] = useState(null);
+	const [contract, setContract] = useState(null);
+	const [api, setApi] = useState(null);
+
+	async function sendTransaction(method, args = []) {
+		await CreateNewPDA();
+		switch (method) {
+			case "CreateAccount":
+				await CreateAccount.apply(this, args)
+				break;
+			case "UpdatePrivatekey":
+				await UpdatePrivatekey.apply(this, args);
+				break;
+			case "UpdateAccessToken":
+				await UpdateAccessToken.apply(this, args);
+				break;
+			case "CreateTrial":
+				await CreateTrial.apply(this, args);
+				break;
+			case "CreateSurvey":
+				await CreateSurvey.apply(this, args);
+				break;
+			case "CreateOrSaveSections":
+				await CreateOrSaveSections.apply(this, args);
+				break;
+			case "CreateSurveyCategory":
+				await CreateSurveyCategory.apply(this, args);
+				break;
+			case "UpdateTrial":
+				await UpdateTrial.apply(this, args);
+				break;
+			case "UpdateSurvey":
+				await UpdateSurvey.apply(this, args);
+				break;
+			case "UpdateReward":
+				await UpdateReward.apply(this, args);
+				break;
+			case "UpdateAudience":
+				await UpdateAudience.apply(this, args);
+				break;
+			case "UpdateUser":
+				await UpdateUser.apply(this, args);
+				break;
+			case "UpdateFhir":
+				await UpdateFhir.apply(this, args);
+				break;
+			case "CreateOngoingTrail":
+				await CreateOngoingTrail.apply(this, args);
+				break;
+			case "CreateCompletedSurveys":
+				await CreateCompletedSurveys.apply(this, args);
+				break;
+		}
+
+	}
+
+	async function getMapsFromContract(mapName) {
+		let db = await getOutput();
+		return db.map.get(mapName) !== undefined ? JSON.parse(db.map.get(mapName)) : [];
+	}
+	//Not using in front
+	async function ReadVariablesFromContract(variable) {
+		switch (variable) {
+			case "_UserIds":
+				return (await getMapsFromContract("_userMap")).length;
+			case "_TrialIds":
+				return (await getMapsFromContract("_trialMap")).length;
+			case "_SurveyIds":
+				return (await getMapsFromContract("_surveyMap")).length;
+			case "_SurveyCategoryIds":
+				return (await getMapsFromContract("_categoryMap")).length;
+			case "_OngoingIds":
+				return (await getMapsFromContract("_ongoingMap")).length;
+			case "_AnsweredIds":
+				return (await getMapsFromContract("_questionanswerdMap")).length;
+
+		}
+	}
+
+	//Not using in front
+	async function ReadMapsByIdFromContract(variable, args = null) {
+		let db, oldMaps, fullJSON;
+		switch (variable) {
+			case "_userMap":
+				return (await getMapsFromContract("_userMap"))[args[0]];
+			case "_trialMap":
+				return (await getMapsFromContract("_trialMap"))[args[0]];
+			case "_trialAudienceMap":
+				return (await getMapsFromContract("_trialAudienceMap"))[args[0]];
+			case "_surveyMap":
+				return (await getMapsFromContract("_surveyMap"))[args[0]];
+			case "_categoryMap":
+				return (await getMapsFromContract("_categoryMap"))[args[0]];
+			case "_sectionsMap":
+
+				db = await getOutput();
+				oldMaps = getAllContainsMapKeys(db.map, `_sectionsMap[${args[0]}]`);
+				fullJSON = "";
+				for (let i = 0; i < oldMaps.length; i++) {
+					const mapName = oldMaps[i];
+					let value = db.map.get(mapName)
+					if (value !== "-1" || value !== null) {
+						fullJSON += value;
+					}
+				}
+				return fullJSON;
+			case "_fhirMap":
+				db = await getOutput();
+				oldMaps = getAllContainsMapKeys(db.map, `_fhirMap[${args[0]}]`);
+				fullJSON = "";
+				for (let i = 0; i < oldMaps.length; i++) {
+					const mapName = oldMaps[i];
+					let value = db.map.get(mapName)
+					if (value !== "-1" || value !== null) {
+						fullJSON += value;
+					}
+				}
+				return fullJSON;
+
+			case "_ongoingMap":
+				return (await getMapsFromContract("_ongoingMap"))[args[0]];
+			case "_questionanswerdMap":
+				return (await getMapsFromContract("_questionanswerdMap"))[args[0]];
+			case "_completedsurveyMap":
+				return (await getMapsFromContract("_completedsurveyMap"))[args[0]];
+
+		}
+	}
+
+	//Using all here
+	async function ReadContractByQuery(method, args = []) {
+
+		if (args === null) {
+			return await ReadVariablesFromContract(method);
+		}
+
+		switch (method) {
+			case "CheckEmail":
+				return await CheckEmail.apply(this, args)
+				break;
+			case "Login":
+				return await Login.apply(this, args)
+				break;
+			case "getUserDetails":
+				return await getUserDetails.apply(this, args)
+				break;
+			case "getAllSurveysIDByTrial":
+				return await getAllSurveysIDByTrial.apply(this, args)
+				break;
+			case "GetOngoingTrial":
+				return await GetOngoingTrial.apply(this, args)
+				break;
+			case "getAllCompletedSurveysIDByUser":
+				return await getAllCompletedSurveysIDByUser.apply(this, args)
+				break;
+			default:
+				return await ReadMapsByIdFromContract(method, args)
+		}
+
+	}
+	 function getQuery(find_contract) {
+		return find_contract;
+	}
+
+	const fetchData = async () => {
+		if (window.localStorage.getItem("type") === "solflare") {
+			try {
+				await window.solflare.connect();
+				// Establish connection to the cluster
+				await establishConnection();
+
+				// Check if the program has been deployed
+				await checkProgram();
+
+				let output = await getOutput();
+				if (!output.initialized) {
+					await InitializeState();
+				}
+
+				window.contract = true;
+				setContract(true);
+				setSignerAddress(window.solflare.publicKey.toBase58());
+				setApi(true);
+
+			} catch (error) {
+				console.error(error);
+			}
+		}
+	};
+	useEffect(() => {
+
+		setTimeout(() => {
+			fetchData();
+		}, 200)
+
+	}, []);
 
 
-    async function sendTransaction( method, args = []) {
-        await CreateNewPDA();
-        switch (method) {
-            case "CreateAccount":
-                await CreateAccount.apply(this, args)
-                break;
-            case "UpdatePrivatekey":
-                await UpdatePrivatekey.apply(this, args);
-                break;
-            case "UpdateAccessToken":
-                await UpdateAccessToken.apply(this, args);
-                break;
-            case "CreateTrial":
-                await CreateTrial.apply(this, args);
-                break;
-            case "CreateSurvey":
-                await CreateSurvey.apply(this, args);
-                break;
-            case "CreateOrSaveSections":
-                await CreateOrSaveSections.apply(this, args);
-                break;
-            case "CreateSurveyCategory":
-                await CreateSurveyCategory.apply(this, args);
-                break;
-            case "UpdateTrial":
-                await UpdateTrial.apply(this, args);
-                break;
-            case "UpdateSurvey":
-                await UpdateSurvey.apply(this, args);
-                break;
-            case "UpdateReward":
-                await UpdateReward.apply(this, args);
-                break;
-            case "UpdateAudience":
-                await UpdateAudience.apply(this, args);
-                break;
-            case "UpdateUser":
-                await UpdateUser.apply(this, args);
-                break;
-            case "UpdateFhir":
-                await UpdateFhir.apply(this, args);
-                break;
-            case "CreateOngoingTrail":
-                await CreateOngoingTrail.apply(this, args);
-                break;
-            case "CreateCompletedSurveys":
-                await CreateCompletedSurveys.apply(this, args);
-                break;
-        }
-
-    }
-
-    async function getMapsFromContract(mapName) {
-        let db = await getOutput();
-        return db.map.get(mapName) !== undefined ? JSON.parse(db.map.get(mapName)) : [];
-    }
-    //Not using in front
-    async function ReadVariablesFromContract(variable) {
-        switch (variable) {
-            case "_UserIds":
-                return (await getMapsFromContract("_userMap")).length;
-            case "_TrialIds":
-                return (await getMapsFromContract("_trialMap")).length;
-            case "_SurveyIds":
-                return (await getMapsFromContract("_surveyMap")).length;
-            case "_SurveyCategoryIds":
-                return (await getMapsFromContract("_categoryMap")).length;
-            case "_OngoingIds":
-                return (await getMapsFromContract("_ongoingMap")).length;
-            case "_AnsweredIds":
-                return (await getMapsFromContract("_questionanswerdMap")).length;
-
-        }
-    }
-
-    //Not using in front
-    async function ReadMapsByIdFromContract(variable, args = null) {
-        let db, oldMaps, fullJSON;
-        switch (variable) {
-            case "_userMap":
-                return (await getMapsFromContract("_userMap"))[args[0]];
-            case "_trialMap":
-                return (await getMapsFromContract("_trialMap"))[args[0]];
-            case "_trialAudienceMap":
-                return (await getMapsFromContract("_trialAudienceMap"))[args[0]];
-            case "_surveyMap":
-                return (await getMapsFromContract("_surveyMap"))[args[0]];
-            case "_categoryMap":
-                return (await getMapsFromContract("_categoryMap"))[args[0]];
-            case "_sectionsMap":
-
-                db = await getOutput();
-                oldMaps = getAllContainsMapKeys(db.map, `_sectionsMap[${args[0]}]`);
-                fullJSON = "";
-                for (let i = 0; i < oldMaps.length; i++) {
-                    const mapName = oldMaps[i];
-                    let value = db.map.get(mapName)
-                    if (value !== "-1" || value !== null) {
-                        fullJSON += value;
-                    }
-                }
-                return fullJSON;
-            case "_fhirMap":
-                db = await getOutput();
-                oldMaps = getAllContainsMapKeys(db.map, `_fhirMap[${args[0]}]`);
-                fullJSON = "";
-                for (let i = 0; i < oldMaps.length; i++) {
-                    const mapName = oldMaps[i];
-                    let value = db.map.get(mapName)
-                    if (value !== "-1" || value !== null) {
-                        fullJSON += value;
-                    }
-                }
-                return fullJSON;
-
-            case "_ongoingMap":
-                return (await getMapsFromContract("_ongoingMap"))[args[0]];
-            case "_questionanswerdMap":
-                return (await getMapsFromContract("_questionanswerdMap"))[args[0]];
-            case "_completedsurveyMap":
-                return (await getMapsFromContract("_completedsurveyMap"))[args[0]];
-
-        }
-    }
-
-    //Using all here
-    async function ReadContract( method, args = []) {
-
-        if (args === null ) {
-            return await ReadVariablesFromContract(method);
-        }
-
-        switch (method) {
-            case "CheckEmail":
-                return await CheckEmail.apply(this, args)
-                break;
-            case "Login":
-                return await Login.apply(this, args)
-                break;
-            case "getUserDetails":
-                return await getUserDetails.apply(this, args)
-                break;
-            case "getAllSurveysIDByTrial":
-                return await getAllSurveysIDByTrial.apply(this, args)
-                break;
-            case "GetOngoingTrial":
-                return await GetOngoingTrial.apply(this, args)
-                break;
-            case "getAllCompletedSurveysIDByUser":
-                return await getAllCompletedSurveysIDByUser.apply(this, args)
-                break;
-            default:
-                return await ReadMapsByIdFromContract(method, args)
-        }
-
-    }
-
-    useEffect(() => {
-        const fetchData = async () => {
-            if (window.localStorage.getItem("type") === "solflare") {
-                try {
-                    await window.solflare.connect();
-                    // Establish connection to the cluster
-                    await establishConnection();
-
-                    // Check if the program has been deployed
-                    await checkProgram();
-
-                    let output = await getOutput();
-                    if (!output.initialized) {
-                        await InitializeState();
-                    }
-
-                    window.contract = true;
-                    setInitContract(true);
-                    setSignerAddress(window.solflare.publicKey.toBase58());
-
-
-                } catch (error) {
-                    console.error(error);
-                }
-            }
-        };
-        setTimeout(() => {
-            fetchData();
-        }, 200)
-
-    }, []);
-
-
-    return <AppContext.Provider value={{ReadContract:ReadContract, sendTransaction:sendTransaction,solanaSignerAddress:solanaSignerAddress,InitContract:InitContract }}>{children}</AppContext.Provider>;
+	return <AppContext.Provider value={{ signerAddress: signerAddress, contract: contract,api:api, sendTransaction: sendTransaction, ReadContractByQuery: ReadContractByQuery, getQuery: getQuery }}>{children}</AppContext.Provider>;
 
 }
 export const useSolanaContext = () => useContext(AppContext);
@@ -304,7 +313,7 @@ export async function CreateAccount(full_name, email, password) {
 		email: email,
 		password: password,
 		privatekey: "",
-		walletaddress: window.braveSolana.publicKey.toBase58(),
+		walletaddress: window.solflare.publicKey.toBase58(),
 		image: "https://i.postimg.cc/SsxGw5cZ/person.jpg",
 		credits: 0,
 		accesstoken: "",

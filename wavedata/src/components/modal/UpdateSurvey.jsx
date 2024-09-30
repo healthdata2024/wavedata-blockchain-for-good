@@ -3,7 +3,7 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { CurrencyDollarIcon } from "@heroicons/react/solid";
-import {usePolkadotContext} from "../../contextx/PolkadotContext.js";
+import {useMixedContext} from "../../contextx/MixedContext.js";
 
 export default function UpdateSurveyModal({
     show,
@@ -12,7 +12,7 @@ export default function UpdateSurveyModal({
 }) {
 
 
-    const { api, contract, signerAddress, sendTransaction, ReadContractValue, ReadContractByQuery, getMessage, getQuery, getTX } = usePolkadotContext();;
+    const { api, contract, signerAddress, sendTransaction,  ReadContractByQuery, getMessage, getQuery, getTX } = useMixedContext();;
 
 
     async function UpdateSurveyHandle(e) {

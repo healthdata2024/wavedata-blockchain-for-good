@@ -4,7 +4,7 @@ import React from "react";
 import Select from "react-select";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { PlusSmIcon, ChevronRightIcon, PencilIcon, TrashIcon, PlusIcon, DocumentDuplicateIcon } from "@heroicons/react/solid";
-import {usePolkadotContext} from "../contextx/PolkadotContext.js";
+import {useMixedContext} from "../contextx/MixedContext.js";
 import UpdateSurveyModal from "../components/modal/UpdateSurvey";
 
 import "./SurveyDetails.css";
@@ -13,7 +13,7 @@ function SurveyDetails() {
 		sectionsloaded: false,
 		data: []
 	};
-	const { api, contract, signerAddress, sendTransaction, ReadContractValue, ReadContractByQuery, getMessage, getQuery } = usePolkadotContext();;
+	const { api, contract, signerAddress, sendTransaction,  ReadContractByQuery, getMessage, getQuery } = useMixedContext();;
 	const params = useParams();
 	const navigate = useNavigate();
 	let location = useLocation();

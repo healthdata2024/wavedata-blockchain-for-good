@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import {usePolkadotContext} from "../contextx/PolkadotContext.js";
+import {useMixedContext} from "../contextx/MixedContext.js";
 import Cookies from 'js-cookie'
 function Payment() {
 	const [tabIndex, setTabIndex] = useState(0);
 	const [privatekey, setprivatekey] = useState("");
-	const {  api,contract, signerAddress, sendTransaction,ReadContractValue,ReadContractByQuery,getMessage,getQuery,getTX } = usePolkadotContext();;
+	const {  api,contract, signerAddress, sendTransaction,ReadContractByQuery,getMessage,getQuery,getTX } = useMixedContext();;
  
 	const TABS = [
 		{
