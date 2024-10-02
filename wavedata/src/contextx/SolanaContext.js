@@ -4,6 +4,7 @@ import { createContext } from 'react';
 import {
 	establishConnection,
 	checkProgram,
+	SystemProgram,
 	InitializeState,
 	getOutput,
 	UpdateOrInsertData,
@@ -18,7 +19,7 @@ const AppContext = createContext({
 	sol_sendTransaction: async (method, args = [], value = 0) => { },
 	sol_ReadContractByQuery: async (query, args = null) => { },
 	sol_getMessage: async (find_contract) => { },
-	sol_getQuery:  (find_contract) => { return find_contract;},
+	sol_getQuery: (find_contract) => { return find_contract; },
 	sol_getTX: async (find_contract) => { },
 	sol_currentChain: null,
 
@@ -114,7 +115,14 @@ export function SolanaProvider({ children }) {
 			case "_studyMap":
 				return (await getMapsFromContract("_studyMap"))[args[0]];
 			case "_studyAudienceMap":
-				return (await getMapsFromContract("_studyAudienceMap"))[args[0]];
+				let  _studyAudienceMap = (await getMapsFromContract("_studyAudienceMap"));
+				for (let i = 0; i < _studyAudienceMap.length; i++) {
+					const element = _studyAudienceMap[i];
+					if (args[0] === element.studyId) {
+						return _studyAudienceMap[i].audienceInfo ;
+					}
+				}
+				return "{}";
 			case "_surveyMap":
 				return (await getMapsFromContract("_surveyMap"))[args[0]];
 			case "_categoryMap":
@@ -186,7 +194,7 @@ export function SolanaProvider({ children }) {
 		}
 
 	}
-	 function getQuery(find_contract) {
+	function getQuery(find_contract) {
 		return find_contract;
 	}
 
@@ -224,7 +232,7 @@ export function SolanaProvider({ children }) {
 	}, []);
 
 
-	return <AppContext.Provider value={{ sol_signerAddress: signerAddress,  sol_contract: contract, sol_api:api,  sol_sendTransaction: sendTransaction,  sol_ReadContractByQuery: ReadContractByQuery, sol_getQuery: getQuery }}>{children}</AppContext.Provider>;
+	return <AppContext.Provider value={{ sol_signerAddress: signerAddress, sol_contract: contract, sol_api: api, sol_sendTransaction: sendTransaction, sol_ReadContractByQuery: ReadContractByQuery, sol_getQuery: getQuery }}>{children}</AppContext.Provider>;
 
 }
 export const useSolanaContext = () => useContext(AppContext);
@@ -390,7 +398,8 @@ export async function CreateSurvey(studyId, userId, name, description, date, ima
 	let _surveyMap = db.map.get("_surveyMap") !== undefined ? JSON.parse(db.map.get("_surveyMap")) : [];
 	obj['surveyId'] = _surveyMap.length;
 	_surveyMap.push(obj);
-	await UpdateOrInsertData('_surveyMap', JSON.stringify(_surveyMap));
+
+	await UpdateOrInsertData('_surveyMap', JSON.stringify(_surveyMap),{send:true,lamports:reward});
 }
 export async function getCurrentStringSize(key, value) {
 

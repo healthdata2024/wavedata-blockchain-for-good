@@ -24,7 +24,7 @@ export default function UpdateStudyModal({
         updateBTN.disabled = true;
 
         try {
-            await sendTransaction( "UpdateStudy",[Number(id),image.value,title.value,description.value, (parseInt(budget.value) * 1e18).toFixed(0)]);
+            await sendTransaction( "UpdateStudy",[Number(id),image.value,title.value,description.value, window.WrapBigNum(parseInt(budget.value))]);
             
             notificationSuccess.style.display = "block";
             updateBTN.children[0].classList.add("hidden")

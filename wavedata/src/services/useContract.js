@@ -164,4 +164,6 @@ export default function useContract() {
 
 	return contractInstance;
 }
-window.ParseBigNum = (num)=> Number(num.replaceAll(",",""))/1e18
+window.ParseBigNum = (num)=> {
+	return Number(num.toString().replaceAll(",",""))/1e18
+}

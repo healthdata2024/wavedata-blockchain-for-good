@@ -24,7 +24,7 @@ export default function UpdateSurveyModal({
         updateBTN.children[1].innerText = ""
         updateBTN.disabled = true;
         try {
-            await sendTransaction( "UpdateSurvey", [parseInt(id), name.value, description.value, image.value, (Number(reward.value) * 1e18).toFixed(0)]);
+            await sendTransaction( "UpdateSurvey", [parseInt(id), name.value, description.value, image.value, window.WrapBigNum(Number(reward.value))]);
             notificationSuccess.style.display = "block";
             updateBTN.children[0].classList.add("hidden")
             updateBTN.children[1].innerText = "Update Survey"
@@ -116,7 +116,7 @@ export default function UpdateSurveyModal({
                             <span className="input-group-addon text-sm pt-2 pb-2 pl-3 pr-3 font-normal -mr-1 leading-none text-gray-700 text-center bg-gray-200 border-gray-400 border rounded">
                                 <CurrencyDollarIcon className="w-5 h-5 text-gray-500" />
                             </span>
-                            <input required name="reward" placeholder="Reward" id="reward" type='number' className="w-24 text-black pr-2 border-gray-400 border pl-2" />
+                            <input required name="reward" placeholder="Reward" id="reward" type='text' className="w-24 text-black pr-2 border-gray-400 border pl-2" />
                         </div>
                     </Form.Group>
                     <div className="d-grid">

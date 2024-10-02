@@ -28,7 +28,7 @@ export default function CreateSurveyModal({
         surveyBTN.children[1].innerText = ""
         surveyBTN.disabled = true;
         try {
-            await sendTransaction( "CreateSurvey",[Number(Studyid),Cookies.get("userid"),name.value,description.value,d,image.value, (Number(reward.value) * 1e18).toFixed(0)],(Number(reward.value) * 1e18).toFixed(0));
+            await sendTransaction( "CreateSurvey",[Number(Studyid),Cookies.get("userid"),name.value,description.value,d,image.value, window.WrapBigNum(reward.value)],window.WrapBigNum(reward.value));
             
             notificationSuccess.style.display = "block";
             surveyBTN.children[0].classList.add("hidden")
@@ -89,7 +89,7 @@ export default function CreateSurveyModal({
                     </Form.Group>
                     <Form.Group className="mb-3 grid" controlId="formGroupName">
                         <Form.Label>Reward</Form.Label>
-                        <input required name="reward" placeholder="Reward" id="reward" type='number' className="w-40 border rounded pt-2 pb-2 border-gray-400 pl-4 pr-4" />
+                        <input required name="reward"  placeholder="Reward" id="reward" type='text' className="w-40 border rounded pt-2 pb-2 border-gray-400 pl-4 pr-4" />
                        
                     </Form.Group>
                     <div className="d-grid">

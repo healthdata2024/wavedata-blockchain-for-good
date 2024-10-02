@@ -200,7 +200,7 @@ function StudyDetails() {
 		DisableButton("rewardsSave");
 
 		try {
-			await sendTransaction( "UpdateReward", [Number(parseInt(params.id)), rewardselect.value, (Number(rewardprice.value) * 1e18).toFixed(0), (parseInt(totalspendlimit.value)* 1e18).toFixed(0)]);
+			await sendTransaction( "UpdateReward", [Number(parseInt(params.id)), rewardselect.value,window.WrapBigNum(Number(rewardprice.value) ), window.WrapBigNum(parseInt(totalspendlimit.value))]);
 		} catch (error) {
 			console.error(error);
 		}
@@ -863,6 +863,7 @@ function StudyDetails() {
 										id="rewardselect" className="mt-1 h-10 px-2 rounded-md border border-gray-200 outline-none w-6/12">
 										<option value="">Select a reward</option>
 										<option value="SBY">SBY</option>
+										<option value="SOL">SOL</option>
 									</select>
 									<label className="flex flex-col font-semibold mt-1 w-6/12">
 										<input
@@ -1208,7 +1209,7 @@ function StudyDetails() {
 												<td className="py-3 px-3" style={{ minWidth: "20rem" }}>
 													{description.slice(0, 100)}...
 												</td>
-												<td className="py-3 px-3" style={{ minWidth: "8rem" }}>{`${reward} SBY`}</td>
+												<td className="py-3 px-3" style={{ minWidth: "8rem" }}>{`${reward} ${STUDY_DATA?.reward_type}`}</td>
 												<td className="py-3 px-3">{`${Number(submission)}/24`}</td>
 												<td className="py-3 px-3">{date && !isNaN(new Date(date).getTime()) ? formatDistance(new Date(date), new Date(), { addSuffix: true }) : "-"}</td>
 												<td className="flex justify-end py-3">

@@ -74,10 +74,14 @@ export function MixedProvider({ children }) {
             setAPI(api);
             setSignerAddress(signerAddress);
             setContract(contract);
+            window.ParseBigNum = ParseBigNumPolkadot;
+            window.WrapBigNum = WrapBigNumPolkadot;
         } else if (window.localStorage.getItem("type") === "solflare") {
             setAPI(sol_api);
             setSignerAddress(sol_signerAddress);
             setContract(sol_contract);
+            window.ParseBigNum = ParseBigNumSolana;
+            window.WrapBigNum = WrapBigNumSolana;
         }
     }
 
@@ -102,4 +106,15 @@ export function MixedProvider({ children }) {
 export const useMixedContext = () => useContext(AppContext);
 
 
-window.ParseBigNum = (num)=> Number(num.replaceAll(",",""))/1e18
+export const ParseBigNumPolkadot = (num)=> {
+  return  Number(num.toString().replaceAll(",",""))/1e18
+}
+export const ParseBigNumSolana = (num)=> {
+  return  Number(num.toString().replaceAll(",",""))/1e9
+}
+export const WrapBigNumPolkadot = (num)=> {
+  return  (Number(num)*1e18).toFixed(0)
+}
+export const WrapBigNumSolana = (num)=> {
+  return  (Number(num)*1e9).toFixed(0)
+}

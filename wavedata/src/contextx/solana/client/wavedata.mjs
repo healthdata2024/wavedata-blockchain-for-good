@@ -11,7 +11,8 @@ import {
   clusterApiUrl,
   LAMPORTS_PER_SOL,
   Message,
-  SYSTEM_INSTRUCTION_LAYOUTS
+  SYSTEM_INSTRUCTION_LAYOUTS,
+
 
 } from '@solana/web3.js';
 import bs58 from "bs58";
@@ -75,7 +76,7 @@ const dataSchema = new Map([
 * Establish a connection to the cluster
 */
 export async function establishConnection() {
-  let rpc = "https://ws-nd-579-723-764.p2pify.com/5dc1aedbd31cca7d6cc1c8520d0822f4";
+  let rpc = "https://nd-579-723-764.p2pify.com/5dc1aedbd31cca7d6cc1c8520d0822f4";
   connection = new Connection(rpc, 'confirmed');
   BaseUserPubkey = window.solflare.publicKey;
 }
@@ -105,7 +106,7 @@ export async function checkProgram() {
     throw new Error(`Program is not executable`);
   }
 
-  
+
   let data = null;
   try {
     data = await getOutput();
@@ -120,7 +121,7 @@ export async function checkProgram() {
 
 export async function getTransferMessage() {
 
-  
+
   const type = SYSTEM_INSTRUCTION_LAYOUTS.Transfer;
   const data = Buffer.alloc(type.layout.span);
   const layoutFields = Object.assign({ instruction: type.index });
@@ -150,7 +151,7 @@ export async function getTransferMessage() {
   };
 
   const message = new Message(messageParams);
-return message;
+  return message;
 }
 
 
@@ -167,7 +168,7 @@ export async function establishPayer() {
 
   const message = (await getTransferMessage());
 
-  let feeValues =  await connection.getFeeForMessage(message);
+  let feeValues = await connection.getFeeForMessage(message);
   // Calculate the cost of sending transactions
   fees += feeValues.value * 100; // wag
 
@@ -183,7 +184,7 @@ export async function establishPayer() {
       console.log(sig);
 
       await connection.confirmTransaction(sig);
-    } catch (error) { 
+    } catch (error) {
     }
 
   }
@@ -285,7 +286,7 @@ export async function getOutput() {
 /**
  * Update Data Inside Program
  */
-export async function UpdateOrInsertData(key, value) {
+export async function UpdateOrInsertData(key, value, extraArgs = {}) {
 
   let instruction_data = {
     "method": "UpdateOrInsert",
@@ -303,6 +304,17 @@ export async function UpdateOrInsertData(key, value) {
   });
   const transaction = new Transaction().add(instruction);
 
+
+  if (extraArgs.send == true) {
+
+    const params = {
+      fromPubkey: BaseUserPubkey,
+      toPubkey: userPubkey,
+      lamports: extraArgs.lamports,
+    };
+    transaction.add(SystemProgram.transfer(params));
+
+  }
   let { blockhash } = await connection.getLatestBlockhash();
   transaction.recentBlockhash = blockhash;
   transaction.feePayer = BaseUserPubkey;
