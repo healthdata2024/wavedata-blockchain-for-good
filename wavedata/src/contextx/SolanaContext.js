@@ -42,8 +42,8 @@ export function SolanaProvider({ children }) {
 			case "UpdateAccessToken":
 				await UpdateAccessToken.apply(this, args);
 				break;
-			case "CreateTrial":
-				await CreateTrial.apply(this, args);
+			case "CreateStudy":
+				await CreateStudy.apply(this, args);
 				break;
 			case "CreateSurvey":
 				await CreateSurvey.apply(this, args);
@@ -54,8 +54,8 @@ export function SolanaProvider({ children }) {
 			case "CreateSurveyCategory":
 				await CreateSurveyCategory.apply(this, args);
 				break;
-			case "UpdateTrial":
-				await UpdateTrial.apply(this, args);
+			case "UpdateStudy":
+				await UpdateStudy.apply(this, args);
 				break;
 			case "UpdateSurvey":
 				await UpdateSurvey.apply(this, args);
@@ -72,8 +72,8 @@ export function SolanaProvider({ children }) {
 			case "UpdateFhir":
 				await UpdateFhir.apply(this, args);
 				break;
-			case "CreateOngoingTrail":
-				await CreateOngoingTrail.apply(this, args);
+			case "CreateOngoingStudy":
+				await CreateOngoingStudy.apply(this, args);
 				break;
 			case "CreateCompletedSurveys":
 				await CreateCompletedSurveys.apply(this, args);
@@ -91,8 +91,8 @@ export function SolanaProvider({ children }) {
 		switch (variable) {
 			case "_UserIds":
 				return (await getMapsFromContract("_userMap")).length;
-			case "_TrialIds":
-				return (await getMapsFromContract("_trialMap")).length;
+			case "_StudyIds":
+				return (await getMapsFromContract("_studyMap")).length;
 			case "_SurveyIds":
 				return (await getMapsFromContract("_surveyMap")).length;
 			case "_SurveyCategoryIds":
@@ -111,10 +111,10 @@ export function SolanaProvider({ children }) {
 		switch (variable) {
 			case "_userMap":
 				return (await getMapsFromContract("_userMap"))[args[0]];
-			case "_trialMap":
-				return (await getMapsFromContract("_trialMap"))[args[0]];
-			case "_trialAudienceMap":
-				return (await getMapsFromContract("_trialAudienceMap"))[args[0]];
+			case "_studyMap":
+				return (await getMapsFromContract("_studyMap"))[args[0]];
+			case "_studyAudienceMap":
+				return (await getMapsFromContract("_studyAudienceMap"))[args[0]];
 			case "_surveyMap":
 				return (await getMapsFromContract("_surveyMap"))[args[0]];
 			case "_categoryMap":
@@ -172,11 +172,11 @@ export function SolanaProvider({ children }) {
 			case "getUserDetails":
 				return await getUserDetails.apply(this, args)
 				break;
-			case "getAllSurveysIDByTrial":
-				return await getAllSurveysIDByTrial.apply(this, args)
+			case "getAllSurveysIDByStudy":
+				return await getAllSurveysIDByStudy.apply(this, args)
 				break;
-			case "GetOngoingTrial":
-				return await GetOngoingTrial.apply(this, args)
+			case "GetOngoingStudy":
+				return await GetOngoingStudy.apply(this, args)
 				break;
 			case "getAllCompletedSurveysIDByUser":
 				return await getAllCompletedSurveysIDByUser.apply(this, args)
@@ -224,7 +224,7 @@ export function SolanaProvider({ children }) {
 	}, []);
 
 
-	return <AppContext.Provider value={{ signerAddress: signerAddress, contract: contract,api:api, sendTransaction: sendTransaction, ReadContractByQuery: ReadContractByQuery, getQuery: getQuery }}>{children}</AppContext.Provider>;
+	return <AppContext.Provider value={{ sol_signerAddress: signerAddress,  sol_contract: contract, sol_api:api,  sol_sendTransaction: sendTransaction,  sol_ReadContractByQuery: ReadContractByQuery, sol_getQuery: getQuery }}>{children}</AppContext.Provider>;
 
 }
 export const useSolanaContext = () => useContext(AppContext);
@@ -265,26 +265,26 @@ export async function getUserDetails(userId) {
 }
 
 
-export async function getAllSurveysIDByTrial(trialId) {
+export async function getAllSurveysIDByStudy(studyId) {
 	let db = await getOutput();
 	let _surveyMap = db.map.get("_surveyMap") !== undefined ? JSON.parse(db.map.get("_surveyMap")) : [];
 	let allSurveys = [];
 
 	for (let i = 0; i < _surveyMap.length; i++) {
 		const element = _surveyMap[i];
-		if (trialId === element.trialId) allSurveys.push(element);
+		if (studyId === element.studyId) allSurveys.push(element);
 	}
 	return allSurveys;
 }
 
 
-export async function GetOngoingTrial(userId) {
+export async function GetOngoingStudy(userId) {
 	let db = await getOutput();
 	let _ongoingMap = db.map.get("_ongoingMap") !== undefined ? JSON.parse(db.map.get("_ongoingMap")) : [];
 
 	for (let i = 0; i < _ongoingMap.length; i++) {
 		const element = _ongoingMap[i];
-		if (userId === element.userId) return element.trialId;
+		if (userId === element.userId) return element.studyId;
 	}
 	return "False";
 }
@@ -312,7 +312,6 @@ export async function CreateAccount(full_name, email, password) {
 		name: full_name,
 		email: email,
 		password: password,
-		privatekey: "",
 		walletaddress: window.solflare.publicKey.toBase58(),
 		image: "https://i.postimg.cc/SsxGw5cZ/person.jpg",
 		credits: 0,
@@ -352,10 +351,10 @@ export async function UpdateAccessToken(userid, accesstoken) {
 
 }
 
-export async function CreateTrial(userId, image, title, description, permission, contributors, audience, budget) {
+export async function CreateStudy(userId, image, title, description, permission, contributors, audience, budget) {
 	let db = await getOutput();
 	var obj = {
-		trialId: 0,
+		studyId: 0,
 		userId: userId,
 		image: image,
 		title: title,
@@ -367,17 +366,19 @@ export async function CreateTrial(userId, image, title, description, permission,
 		rewardType: "SOL",
 		rewardPrice: 0,
 		totalSpendingLimit: budget,
+		ages: "[]",
+		titles: "[]",
 	}
-	let _trialMap = db.map.get("_trialMap") !== undefined ? JSON.parse(db.map.get("_trialMap")) : [];
-	obj['trialId'] = _trialMap.length;
-	_trialMap.push(obj);
-	await UpdateOrInsertData('_trialMap', JSON.stringify(_trialMap));
+	let _studyMap = db.map.get("_studyMap") !== undefined ? JSON.parse(db.map.get("_studyMap")) : [];
+	obj['studyId'] = _studyMap.length;
+	_studyMap.push(obj);
+	await UpdateOrInsertData('_studyMap', JSON.stringify(_studyMap));
 }
-export async function CreateSurvey(trialId, userId, name, description, date, image, reward) {
+export async function CreateSurvey(studyId, userId, name, description, date, image, reward) {
 	let db = await getOutput();
 	var obj = {
 		surveyId: 0,
-		trialId: trialId,
+		studyId: studyId,
 		userId: userId,
 		name: name,
 		description: description,
@@ -455,19 +456,19 @@ export async function CreateSurveyCategory(name, image) {
 	_categoryMap.push(obj);
 	await UpdateOrInsertData('_categoryMap', JSON.stringify(_categoryMap));
 }
-export async function UpdateTrial(trialId, image, title, description, budget) {
+export async function UpdateStudy(studyId, image, title, description, budget) {
 	let db = await getOutput();
-	let _trialMap = db.map.get("_trialMap") !== undefined ? JSON.parse(db.map.get("_trialMap")) : [];
-	for (let i = 0; i < _trialMap.length; i++) {
-		const element = _trialMap[i];
-		if (trialId === element.trialId) {
-			_trialMap[i].image = image;
-			_trialMap[i].title = title;
-			_trialMap[i].description = description;
-			_trialMap[i].budget = budget;
+	let _studyMap = db.map.get("_studyMap") !== undefined ? JSON.parse(db.map.get("_studyMap")) : [];
+	for (let i = 0; i < _studyMap.length; i++) {
+		const element = _studyMap[i];
+		if (studyId === element.studyId) {
+			_studyMap[i].image = image;
+			_studyMap[i].title = title;
+			_studyMap[i].description = description;
+			_studyMap[i].budget = budget;
 		}
 	}
-	await UpdateOrInsertData('_trialMap', JSON.stringify(_trialMap));
+	await UpdateOrInsertData('_studyMap', JSON.stringify(_studyMap));
 
 }
 
@@ -487,41 +488,41 @@ export async function UpdateSurvey(surveyId, name, description, image, reward) {
 
 }
 
-export async function UpdateReward(trialId, rewardType, rewardPrice, totalSpendingLimit) {
+export async function UpdateReward(studyId, rewardType, rewardPrice, totalSpendingLimit) {
 	let db = await getOutput();
-	let _trialMap = db.map.get("_trialMap") !== undefined ? JSON.parse(db.map.get("_trialMap")) : [];
-	for (let i = 0; i < _trialMap.length; i++) {
-		const element = _trialMap[i];
-		if (trialId === element.trialId) {
-			_trialMap[i].rewardType = rewardType;
-			_trialMap[i].rewardPrice = rewardPrice;
-			_trialMap[i].totalSpendingLimit = totalSpendingLimit;
+	let _studyMap = db.map.get("_studyMap") !== undefined ? JSON.parse(db.map.get("_studyMap")) : [];
+	for (let i = 0; i < _studyMap.length; i++) {
+		const element = _studyMap[i];
+		if (studyId === element.studyId) {
+			_studyMap[i].rewardType = rewardType;
+			_studyMap[i].rewardPrice = rewardPrice;
+			_studyMap[i].totalSpendingLimit = totalSpendingLimit;
 		}
 	}
-	await UpdateOrInsertData('_trialMap', JSON.stringify(_trialMap));
+	await UpdateOrInsertData('_studyMap', JSON.stringify(_studyMap));
 
 }
 
-export async function UpdateAudience(trialId, audienceInfo) {
+export async function UpdateAudience(studyId, audienceInfo) {
 	let db = await getOutput();
-	let _trialAudienceMap = db.map.get("_trialAudienceMap") !== undefined ? JSON.parse(db.map.get("_trialAudienceMap")) : [];
+	let _studyAudienceMap = db.map.get("_studyAudienceMap") !== undefined ? JSON.parse(db.map.get("_studyAudienceMap")) : [];
 	let found = false;
-	for (let i = 0; i < _trialAudienceMap.length; i++) {
-		const element = _trialAudienceMap[i];
-		if (trialId === element.trialId) {
-			_trialAudienceMap[i].audienceInfo = audienceInfo;
+	for (let i = 0; i < _studyAudienceMap.length; i++) {
+		const element = _studyAudienceMap[i];
+		if (studyId === element.studyId) {
+			_studyAudienceMap[i].audienceInfo = audienceInfo;
 			found = true;
 		}
 	}
 	if (!found) {
 		var obj = {
-			trialId: trialId,
+			studyId: studyId,
 			audienceInfo: audienceInfo
 		};
-		_trialAudienceMap.push(obj);
+		_studyAudienceMap.push(obj);
 
 	}
-	await UpdateOrInsertData('_trialAudienceMap', JSON.stringify(_trialAudienceMap));
+	await UpdateOrInsertData('_studyAudienceMap', JSON.stringify(_studyAudienceMap));
 
 }
 
@@ -570,11 +571,11 @@ export async function UpdateFhir(userId, familyName, givenName, identifier, phon
 
 }
 
-export async function CreateOngoingTrail(trialId, userId, date, givenPermission) {
+export async function CreateOngoingStudy(studyId, userId, date, givenPermission) {
 	let db = await getOutput();
 	var obj = {
 		ongoingId: 0,
-		trialId: trialId,
+		studyId: studyId,
 		userId: userId,
 		date: date,
 		givenPermission: givenPermission,
@@ -587,22 +588,22 @@ export async function CreateOngoingTrail(trialId, userId, date, givenPermission)
 
 
 
-	let _trialMap = db.map.get("_trialMap") !== undefined ? JSON.parse(db.map.get("_trialMap")) : [];
-	for (let i = 0; i < _trialMap.length; i++) {
-		const element = _trialMap[i];
+	let _studyMap = db.map.get("_studyMap") !== undefined ? JSON.parse(db.map.get("_studyMap")) : [];
+	for (let i = 0; i < _studyMap.length; i++) {
+		const element = _studyMap[i];
 		if (userId === element.userId) {
-			_trialMap[i].contributors += 1;
+			_studyMap[i].contributors += 1;
 		}
 	}
-	await UpdateOrInsertData('_trialMap', JSON.stringify(_trialMap));
+	await UpdateOrInsertData('_studyMap', JSON.stringify(_studyMap));
 
 
 }
-export async function CreateQuestionAnswer(trialId, userId, surveyId, sectionId, questionId, answer) {
+export async function CreateQuestionAnswer(studyId, userId, surveyId, sectionId, questionId, answer) {
 	let db = await getOutput();
 	var obj = {
 		answer_id: 0,
-		trialId: trialId,
+		studyId: studyId,
 		userId: userId,
 		surveyId: surveyId,
 		sectionId: sectionId,
@@ -618,11 +619,11 @@ export async function CreateQuestionAnswer(trialId, userId, surveyId, sectionId,
 }
 
 
-export async function CreateCompletedSurveys(surveyId, userId, date, trialId) {
+export async function CreateCompletedSurveys(surveyId, userId, date, studyId) {
 	let db = await getOutput();
 	var obj = {
 		completedSurveyId: 0,
-		trialId: trialId,
+		studyId: studyId,
 		userId: userId,
 		surveyId: surveyId,
 		date: date.clone(),

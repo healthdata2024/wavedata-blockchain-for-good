@@ -121,13 +121,8 @@ function Login() {
 				setisSolanaConnected(true);
 			}
 			if (isPolkadotConnected || isSolanaConnected) {
-				if (window.contract != null) {
-					LoadingICON.style.display = "none";
-					buttonTextBox.style.display = "block";
-				} else {
-					buttonTextBox.style.display = "none";
-					LoadingICON.style.display = "block";
-				}
+				LoadingICON.style.display = "none";
+				buttonTextBox.style.display = "block";
 			}
 		}
 

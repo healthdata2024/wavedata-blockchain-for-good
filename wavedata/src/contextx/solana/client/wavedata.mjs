@@ -75,7 +75,8 @@ const dataSchema = new Map([
 * Establish a connection to the cluster
 */
 export async function establishConnection() {
-  connection = new Connection(clusterApiUrl("devnet"), 'confirmed');
+  let rpc = "https://ws-nd-579-723-764.p2pify.com/5dc1aedbd31cca7d6cc1c8520d0822f4";
+  connection = new Connection(rpc, 'confirmed');
   BaseUserPubkey = window.solflare.publicKey;
 }
 
