@@ -22,6 +22,6 @@
 
 ## Test:
 ### Website
-https://wavedata-singapore-polkadot.vercel.app/
+https://wavedata-blockchain-for-good.vercel.app/
 ### App
-https://wavedata-singapore-polkadot-app.vercel.app/#/
+https://wavedata-blockchain-for-good-app.vercel.app/

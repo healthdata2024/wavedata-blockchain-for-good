@@ -35,7 +35,7 @@ class _CreditScreenState extends ConsumerState<CreditScreen> {
   };
 
   int userid = 0;
-  String domain = 'https://wavedata-singapore-polkadot.onrender.com';
+  String domain = 'https://wavedata-blockchain-for-good.onrender.com';
 
   Future<void> GetAccountData() async {
     // Obtain shared preferences.

@@ -34,7 +34,7 @@ class _ConnectDataScreenState extends ConsumerState<ConnectDataScreen> {
     "Content-Type": "application/x-www-form-urlencoded"
   };
   bool termsBool = false;
-  String baseURL = 'https://wavedata-singapore-polkadot.onrender.com';
+  String baseURL = 'https://wavedata-blockchain-for-good.onrender.com';
 
   @override
   initState() {

@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 
 import '../model/study_action.dart';
 
-const domain = 'https://wavedata-singapore-polkadot.onrender.com';
+const domain = 'https://wavedata-blockchain-for-good.onrender.com';
 
 final mainProvider =
     ChangeNotifierProvider<MainProvider>((ref) => MainProvider());
