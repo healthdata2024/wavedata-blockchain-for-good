@@ -16,6 +16,8 @@
     "@polkadot/types": "12.3.1",
     "@polkadot/ui-keyring": "^3.9.1",
     "@polkadot/util": "^13.0.2",
+    "@solana/web3.js": "^1.95.3",
+    "borsh": "^2.0.0",
     "crypto-browserify": "^3.11.0",
     "cypress": "^11.2.0",
     "https-browserify": "^1.0.0",
