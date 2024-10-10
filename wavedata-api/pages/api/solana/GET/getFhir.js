@@ -4,11 +4,12 @@ export default async function handler(req, res) {
 		await FixCors.default(res);
 	} catch (error) {}
 
-	let useContract = await import("../../../../contract/useContract.ts");
+	let useContract = await import("../../../../contract/useContractSolana.js");
 const {api,  signerAddress, sendTransaction, ReadContract} = await useContract.default();
 	
 	let userdetails = await ReadContract(api, signerAddress, ("getUserDetails"), [Number(req.query.userid)]);
-	let fhir_element = JSON.parse(await ReadContract(api, signerAddress, ("_fhirMap"), [Number(req.query.userid)]));
+	let fhir_element =(await ReadContract(api, signerAddress, ("_fhirMap"), [Number(req.query.userid)]));
+	console.log(fhir_element)
 	var newFhir = {
 		id: Number(fhir_element.userId),
 		family_name: fhir_element.familyName,
@@ -19,6 +20,7 @@ const {api,  signerAddress, sendTransaction, ReadContract} = await useContract.d
 		about: fhir_element.about,
 		patient_id: fhir_element.patientId,
 		privatekey: userdetails.privatekey,
+		walletaddress: userdetails.walletaddress ,
 		image: fhir_element.image,
 		credits: fhir_element.credits
 	};

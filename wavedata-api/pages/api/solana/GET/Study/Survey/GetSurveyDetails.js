@@ -4,7 +4,7 @@ export default async function handler(req, res) {
 		await FixCors.default(res);
 	} catch (error) {}
 
-	let useContract = await import("../../../../../../contract/useContract.ts");
+	let useContract = await import("../../../../../../contract/useContractSolana.js");
 	const {api,  signerAddress, sendTransaction, ReadContract} = await useContract.default();
 
 	let survey_element = await ReadContract(api, signerAddress, "_surveyMap", [Number(req.query.surveyid)]);

@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:wavedata/components/data_edit_item.dart';
 import 'package:wavedata/components/data_edit_date_item.dart';
 import 'package:wavedata/model/airtable_api.dart';
+import 'package:wavedata/components/data_edit_dropdown.dart';
 
 class RegisterModal extends StatefulWidget {
   @override
@@ -22,8 +23,12 @@ class RegisterApp extends State<RegisterModal> {
   TextEditingController dateTXT = new TextEditingController();
   TextEditingController passwordTXT = new TextEditingController();
   TextEditingController ConPassTXT = new TextEditingController();
+  TextEditingController BlockchainTXT = new TextEditingController();
+
+  
   bool isLoading = false;
-  String baseURL=  'https://wavedata-blockchain-for-good.onrender.com';
+  String baseURL=  'http://localhost:3000';
+  String blockchain=  'polkadot';
   var POSTheader = {
     "Accept": "application/json",
     "Content-Type": "application/x-www-form-urlencoded"
@@ -31,17 +36,18 @@ class RegisterApp extends State<RegisterModal> {
 
   Future<void> RegisterAccount() async {
     var url = Uri.parse(
-        '${baseURL}/api/GET/checkEmail?email=${Uri.encodeComponent(emailTXT.text)}');
+        '${baseURL}/api/${blockchain}/GET/checkEmail?email=${Uri.encodeComponent(emailTXT.text)}');
     final response = await http.get(url);
     var responseData = json.decode(response.body);
     if (responseData['value'] == "False") {
       var urlReg = Uri.parse(
-          '${baseURL}/api/POST/Register');
+          '${baseURL}/api/${blockchain}/POST/Register');
       await http.post(urlReg, headers: POSTheader, body: {
         'fullname': fullnameTXT.text,
         'email': emailTXT.text,
         'password': passwordTXT.text,
         "birth_date": dateTXT.text,
+        "blockchain":BlockchainTXT.text
       });
 
       Navigator.pop(context);
@@ -55,7 +61,7 @@ class RegisterApp extends State<RegisterModal> {
     return Material(
       child: CupertinoPageScaffold(
         child: Container(
-          height: 560,
+          height: 650,
           width: 400,
           child: Column(
             children: [
@@ -96,6 +102,14 @@ class RegisterApp extends State<RegisterModal> {
                   label: "Repeat Password",
                   isPassword: true,
                   controller: ConPassTXT,
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(left: 24, right: 24),
+                child: DataEditDropdown(
+                  label: "Select Blockchain",
+                  items: const ["Polkadot","Solana"],
+                  controller: BlockchainTXT,
                 ),
               ),
               Container(

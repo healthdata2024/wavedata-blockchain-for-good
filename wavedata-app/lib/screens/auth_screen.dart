@@ -34,7 +34,8 @@ class AuthScreenApp extends State<AuthScreen> {
     "Accept": "application/json",
     "Content-Type": "application/x-www-form-urlencoded"
   };
- String baseURL=  'https://wavedata-blockchain-for-good.onrender.com';
+ String baseURL=  'http://localhost:3000';
+  String blockchain=  'polkadot';
  
 
   @override
@@ -50,7 +51,7 @@ class AuthScreenApp extends State<AuthScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => MainScreen(),
+          builder: (context) => ConnectDataScreen(),
         ),
       );
     }
@@ -77,7 +78,7 @@ class AuthScreenApp extends State<AuthScreen> {
           return;
      }
 
-     var url = Uri.parse('${baseURL}/api/POST/Login');
+     var url = Uri.parse('${baseURL}/api/${blockchain}/POST/Login');
     final response = await http.post(url,
         headers: POSTheader,
         body: {'email': emailTXT.text, 'password': passwordTXT.text});
@@ -90,6 +91,7 @@ class AuthScreenApp extends State<AuthScreen> {
       final prefs = await SharedPreferences.getInstance();
  
       prefs.setString("userid", userid);
+      prefs.setString("blockchain", responseData['blockcahin'].toString().toLowerCase());
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(

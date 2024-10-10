@@ -242,6 +242,7 @@ export function DBProvider({ children }) {
         const newSubject = {
             'study_id': studyId,
             'subject_index_id': subjectIndexId,
+            'blockchain':window.localStorage.getItem("type"),
             'title': title,
             'ages_ans': agesAns
         };

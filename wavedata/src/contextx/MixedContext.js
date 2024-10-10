@@ -31,7 +31,7 @@ export function MixedProvider({ children }) {
     async function _sendTransaction(method, args = [], value = 0) {
         if (window.localStorage.getItem("type") === "polkadot") {
             return await sendTransaction(method, args,value);
-        } else if (window.localStorage.getItem("type") === "solflare") {
+        } else if (window.localStorage.getItem("type") === "solana") {
             return await sol_sendTransaction(method, args,value);
         }
 
@@ -40,7 +40,7 @@ export function MixedProvider({ children }) {
     async function _ReadContractByQuery(query, args = null) {
         if (window.localStorage.getItem("type") === "polkadot") {
             return await ReadContractByQuery(query, args);
-        } else if (window.localStorage.getItem("type") === "solflare") {
+        } else if (window.localStorage.getItem("type") === "solana") {
             return await sol_ReadContractByQuery(query, args);
         }
 
@@ -49,7 +49,7 @@ export function MixedProvider({ children }) {
    async function _getMessage(find_contract) {
         if (window.localStorage.getItem("type") === "polkadot") {
             return await getMessage(find_contract);
-        } else if (window.localStorage.getItem("type") === "solflare") {
+        } else if (window.localStorage.getItem("type") === "solana") {
             return await sol_getMessage(find_contract);
         }
     }
@@ -57,14 +57,14 @@ export function MixedProvider({ children }) {
      function _getQuery(find_contract) {
         if (window.localStorage.getItem("type") === "polkadot") {
             return  getQuery(find_contract);
-        } else if (window.localStorage.getItem("type") === "solflare") {
+        } else if (window.localStorage.getItem("type") === "solana") {
             return  sol_getQuery(find_contract);
         }
     }
     async function _getTX(find_contract) {
         if (window.localStorage.getItem("type") === "polkadot") {
             return await getTX(find_contract);
-        } else if (window.localStorage.getItem("type") === "solflare") {
+        } else if (window.localStorage.getItem("type") === "solana") {
             return await sol_getTX(find_contract);
         }
     }
@@ -76,7 +76,7 @@ export function MixedProvider({ children }) {
             setContract(contract);
             window.ParseBigNum = ParseBigNumPolkadot;
             window.WrapBigNum = WrapBigNumPolkadot;
-        } else if (window.localStorage.getItem("type") === "solflare") {
+        } else if (window.localStorage.getItem("type") === "solana") {
             setAPI(sol_api);
             setSignerAddress(sol_signerAddress);
             setContract(sol_contract);

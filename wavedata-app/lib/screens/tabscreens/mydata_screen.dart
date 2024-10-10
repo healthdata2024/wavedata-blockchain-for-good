@@ -35,7 +35,10 @@ class _MyDataScreenState extends ConsumerState<MyDataScreen> {
   };
 
 
-  String domain = 'https://wavedata-blockchain-for-good.onrender.com';
+  String domain = 'http://localhost:3000';
+
+  String blockchain = 'polkadot';
+
 
   String userid = "";
   String StudyId = "";
@@ -78,7 +81,7 @@ class _MyDataScreenState extends ConsumerState<MyDataScreen> {
    
 
     var urlFH = Uri.parse(
-        '${domain}/api/GET/getFhir?userid=${int.parse(userid.toString())}');
+        '${domain}/api/${blockchain}/GET/getFhir?userid=${int.parse(userid.toString())}');
     final responseFH = await http.get(urlFH);
     var responseDataFH = json.decode(responseFH.body);
 
@@ -104,6 +107,8 @@ class _MyDataScreenState extends ConsumerState<MyDataScreen> {
     setState(() {
       userid = (prefs.getString("userid").toString());
       StudyId = (prefs.getString("studyid").toString());
+        blockchain = prefs.getString("blockchain").toString();
+   
     });
 
     GetFHIRData(userid);
@@ -128,7 +133,7 @@ class _MyDataScreenState extends ConsumerState<MyDataScreen> {
       String userid = (prefs.getString("userid").toString());
 
      var url = Uri.parse(
-          '${domain}/api/POST/UpdateImage');
+          '${domain}/api/${blockchain}/POST/UpdateImage');
       await http.post(url, headers: POSTheader, body: {
         'userid': userid.toString(),
         'image': _textFieldController.text

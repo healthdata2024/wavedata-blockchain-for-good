@@ -11,6 +11,8 @@ export default async function handler(req, res) {
 	
   const { email, password } = req.body;
 	let output = await ReadContractByQuery(api, signerAddress, getQuery(contract,"Login"), [email, password]);
-  res.status(200).json({ status: 200, value: output })
+  let details_element = await ReadContractByQuery(api, signerAddress, getQuery(contract,"getUserDetails"), [Number(output)]);
+
+  res.status(200).json({ status: 200, value: output,"blockcahin":details_element[5] })
 
 }

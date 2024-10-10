@@ -34,13 +34,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     "Content-Type": "application/x-www-form-urlencoded"
   };
 
+  String blockchain = 'polkadot';
 
-  String domain = 'https://wavedata-blockchain-for-good.onrender.com';
+  String domain = 'http://localhost:3000';
 
   String userid = "";
   String StudyId = "";
   int startStudy = 0;
-  
+
   var userDetails = {
     "userid": "",
     "credits": 0,
@@ -60,8 +61,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<void> GetAvialbleData() async {
     avilableStudies = [];
 
-    var url =
-        Uri.parse('${domain}/api/GET/Study/GetAvailableStudy?userid=${userid}');
+    var url = Uri.parse(
+        '${domain}/api/${blockchain}/GET/Study/GetAvailableStudy?userid=${userid}');
     var correctStatus = false;
     var response = null;
     while (correctStatus == false) {
@@ -89,7 +90,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         });
   }
 
-
   Future<void> GetAccountData() async {
     // Obtain shared preferences.
     final prefs = await SharedPreferences.getInstance();
@@ -97,14 +97,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     setState(() {
       userid = (prefs.getString("userid").toString());
       StudyId = (prefs.getString("studyid").toString());
+      blockchain = prefs.getString("blockchain").toString();
+   
     });
 
     await GetAvialbleData();
-   
+
     await mainViewModel.GetUserData();
     await mainViewModel.GetOngoingData();
   }
-
 
   var avilableStudies = [];
 
@@ -177,6 +178,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     Future<void> StartStudy(int studyid) async {
       final prefs = await SharedPreferences.getInstance();
       String userid = (prefs.getString("userid").toString());
+      blockchain = prefs.getString("blockchain").toString();
 
       var given_permission = {
         "family": FamilyNameSwitch,
@@ -192,7 +194,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
       String JsonMadePermission = given_permission.toString();
 
-      var url = Uri.parse('${domain}/api/POST/Study/CreateOngoingStudy');
+      var url = Uri.parse(
+          '${domain}/api/${blockchain}/POST/Study/CreateOngoingStudy');
       await http.post(url, headers: POSTheader, body: {
         'studyid': studyid.toString(),
         'userid': userid.toString(),
@@ -381,7 +384,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           margin: const EdgeInsets.only(
                                               left: 16, top: 8, bottom: 8),
                                           child: Text(
-                                              mainViewModel.ongoingStudies['title']
+                                              mainViewModel
+                                                  .ongoingStudies['title']
                                                   .toString(),
                                               style: GoogleFonts.getFont(
                                                   'Lexend Deca',
@@ -389,7 +393,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                                   fontWeight: FontWeight.bold)),
                                         ),
                                         Image.network(
-                                            mainViewModel.ongoingStudies['image'].toString(),
+                                            mainViewModel
+                                                .ongoingStudies['image']
+                                                .toString(),
                                             width: size.width,
                                             fit: BoxFit.cover)
                                       ],
@@ -406,43 +412,49 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                     width: size.width - 20,
                                     height: 150,
                                     child: ListView.builder(
-                                      itemCount: mainViewModel.surveyActions.length + 1,
+                                      itemCount:
+                                          mainViewModel.surveyActions.length +
+                                              1,
                                       padding: EdgeInsets.only(left: 8),
                                       scrollDirection: Axis.horizontal,
-                                      itemBuilder: ((context, index) => index ==
-                                              0
-                                          ? ActionTile(
-                                              action: mainViewModel.onGoingInformedConsent,
-                                              startFunction: () async {
-                                                final prefs =
-                                                    await SharedPreferences
-                                                        .getInstance();
-                                                prefs.setString(
-                                                    "studyid",
-                                                    mainViewModel.ongoingStudies["studyid"]
-                                                        .toString());
-                                                await Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        InformedConsentScreen(),
-                                                  ),
-                                                );
-                                                GetAccountData();
-                                              })
-                                          : ActionTile(
-                                              action: mainViewModel.surveyActions[index - 1],
-                                              startFunction: () async {
-                                                await Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        FeelingScreen(),
-                                                  ),
-                                                );
-                                                GetAccountData();
-                                              },
-                                            )),
+                                      itemBuilder: ((context, index) =>
+                                          index == 0
+                                              ? ActionTile(
+                                                  action: mainViewModel
+                                                      .onGoingInformedConsent,
+                                                  startFunction: () async {
+                                                    final prefs =
+                                                        await SharedPreferences
+                                                            .getInstance();
+                                                    prefs.setString(
+                                                        "studyid",
+                                                        mainViewModel
+                                                            .ongoingStudies[
+                                                                "studyid"]
+                                                            .toString());
+                                                    await Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            InformedConsentScreen(),
+                                                      ),
+                                                    );
+                                                    GetAccountData();
+                                                  })
+                                              : ActionTile(
+                                                  action: mainViewModel
+                                                      .surveyActions[index - 1],
+                                                  startFunction: () async {
+                                                    await Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            FeelingScreen(),
+                                                      ),
+                                                    );
+                                                    GetAccountData();
+                                                  },
+                                                )),
                                     ),
                                   )
                                 : Text(""))

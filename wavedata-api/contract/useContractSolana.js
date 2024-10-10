@@ -14,6 +14,8 @@ export default async function useContractSolana() {
 		signerAddress: null,
 		sendTransaction: sendTransaction,
 		ReadContract: ReadContract,
+		ParseBigNum:ParseBigNum,
+		WrapBigNum:WrapBigNum
 	};
 
 	// Establish connection to the cluster
@@ -125,13 +127,14 @@ export default async function useContractSolana() {
 				}
 				return fullJSON;
 			case "_fhirMap":
-				 db = await getOutput();
+				db = await getOutput();
 				 oldMaps = getAllContainsMapKeys(db.map, `_fhirMap[${args[0]}]`);
 				 fullJSON = "";
+				 console.log(oldMaps);
 				for (let i = 0; i < oldMaps.length; i++) {
 					const mapName = oldMaps[i];
 					let value =  db.map.get(mapName)
-					if (value !== "-1"|| value !== null){
+					if (value != "-1"|| value !== null){
 						fullJSON +=value;
 					}
 				}
@@ -491,7 +494,7 @@ export async function UpdateUser(userId, image, credits) {
 
 }
 
-export async function UpdateFhir(userId, familyName, givenName, identifier, phone, gender, about, patient_id) {
+export async function UpdateFhir(userId, walletAddress, familyName, givenName, identifier, phone, gender, about, patient_id) {
 
 	let db = await getOutput();
 	let oldMaps = getAllContainsMapKeys(db.map, "_fhirMap");
@@ -507,9 +510,11 @@ export async function UpdateFhir(userId, familyName, givenName, identifier, phon
 		about: about,
 		patientId: patient_id,
 	};
+	console.log(obj);
 	let metadata = JSON.stringify(obj);
 	let totalSize = await getCurrentStringSize("_fhirMap", metadata);
 	let metadatas = getSlicedData(totalSize, metadata);
+
 
 	if (oldMaps.length >= metadatas.length) {
 		for (let i = 0; i < oldMaps.length; i++) {
@@ -522,8 +527,19 @@ export async function UpdateFhir(userId, familyName, givenName, identifier, phon
 			const data = metadatas[i];
 			let mapName = `_fhirMap[${userId}][${i}]`;
 			await UpdateOrInsertData(mapName, data);
+			
 		}
 	}
+
+	let _userMap = db.map.get("_userMap") !== undefined ? JSON.parse(db.map.get("_userMap")) : [];
+	for (let i = 0; i < _userMap.length; i++) {
+		const element = _userMap[i];
+		if (userId === element.userId) {
+			_userMap[i].walletaddress = walletAddress;
+		}
+	}
+	await UpdateOrInsertData('_userMap', JSON.stringify(_userMap));
+
 
 }
 
@@ -619,3 +635,10 @@ export function getArgs(args) {
 export function base64DecodeUnicode(base64String) {
 	return Buffer.from(base64String, "base64").toString('utf8');
 }
+
+  export const ParseBigNum = (num)=> {
+	return  Number(num.toString().replaceAll(",",""))/1e9
+  }
+  export const WrapBigNum = (num)=> {
+	return  (Number(num)*1e9).toFixed(0)
+  }

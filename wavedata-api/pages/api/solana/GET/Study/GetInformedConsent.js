@@ -5,18 +5,18 @@ export default async function handler(req, res) {
         await FixCors.default(res);
     } catch (error) { }
 
-    let useContract = await import("../../../../../contract/useContract.ts");
-    const { api, contract, signerAddress,ParseBigNum, sendTransaction, ReadContractByQuery, getMessage, getQuery } = await useContract.default();
+    let useContract = await import("../../../../../contract/useContractSolana.js");
+    const { api, contract, signerAddress,ParseBigNum, sendTransaction, ReadContract, getMessage, getQuery } = await useContract.default();
     const { study_id, user_id } = req.query;
 
     //Current Age
-    let fhir_element = await ReadContractByQuery(api, signerAddress, getQuery(contract, "_fhirMap"), [Number(user_id)]);
+    let fhir_element = await ReadContract(api, signerAddress, "_fhirMap", [Number(user_id)]);
 
     var bDate = new Date(fhir_element.birthDate);
     var nDate = new Date()
     let currentAge = nDate.getFullYear() - bDate.getFullYear(); //36
 
-    let study_element = await ReadContractByQuery(api, signerAddress, getQuery(contract, "_studyMap"), [Number(study_id)]);
+    let study_element = await ReadContract(api, signerAddress, "_studyMap", [Number(study_id)]);
 
     //Load Ages
     let ages_Data_element = study_element.ages
@@ -63,11 +63,11 @@ export default async function handler(req, res) {
 
     //Load Subjects
 
-    const totalSubjects = await ReadContractByQuery(api, signerAddress, getQuery(contract,"_StudySubjectsIds"));
+    const totalSubjects = await ReadContract(api, signerAddress, "_StudySubjectsIds");
     let draft_subjects = [];
     try {
         for (let i = 0; i < Number(totalSubjects); i++) {
-            let subject_element = await ReadContractByQuery(api, signerAddress, getQuery(contract,"_studySubjectMap"), [i]);
+            let subject_element = await ReadContract(api, signerAddress,"_studySubjectMap", [i]);
             if (Number(study_element.studyId) === Number(subject_element.studyId)) {
                 let elligible_ages_ans = {};
                 if (eligible_age_group.length > 0) {

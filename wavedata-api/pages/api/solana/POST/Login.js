@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   } catch (error) {}
 
   
-  let useContract = await import("../../../../contract/useContract.ts");
+  let useContract = await import("../../../../contract/useContractSolana.js");
     const {api,  signerAddress, sendTransaction, ReadContract} = await useContract.default();
 	
   const { email, password } = req.body;

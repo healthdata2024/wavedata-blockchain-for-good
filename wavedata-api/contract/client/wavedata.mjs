@@ -77,8 +77,8 @@ const dataSchema = new Map([
 */
 export async function establishConnection() {
   let rpc = "https://nd-579-723-764.p2pify.com/5dc1aedbd31cca7d6cc1c8520d0822f4";
-  connection = new Connection(rpc, 'confirmed');
-  BaseUserPubkey = window.solflare.publicKey;
+  let ws = "wss://ws-nd-579-723-764.p2pify.com/5dc1aedbd31cca7d6cc1c8520d0822f4";
+  connection = new Connection(rpc, {wsEndpoint:ws});
 }
 
 
@@ -91,30 +91,15 @@ export async function checkProgram() {
   try {
     const programKeypair = await createKeypairFromFile();
     BackendKeyPair = await getPayerFromFile();
+
+    BaseUserPubkey = BackendKeyPair.publicKey;
     programId = programKeypair.publicKey;
   } catch (err) {
     console.error(err);
 
   }
-  const programInfo = await connection.getAccountInfo(programId);
-
-  if (programInfo === null) {
-    throw new Error(
-      'Program needs to be deployed.',
-    );
-  } else if (!programInfo.executable) {
-    throw new Error(`Program is not executable`);
-  }
-
-
-  let data = null;
-  try {
-    data = await getOutput();
-    return;
-  } catch (err) { }
-
-  await establishPayer();
-  await CreateNewPDA(true);
+  
+  await CreateNewPDA();
 
 
 }
@@ -201,29 +186,6 @@ export async function CreateNewPDA(checkMode = false) {
     SEED,
     programId,
   );
-
-  let data = null;
-  try {
-    data = await getOutput();
-    return;
-  } catch (err) { }
-
-  let Space = 4000000;
-  const lamports = await connection.getMinimumBalanceForRentExemption(Space);
-
-  const transaction = new Transaction().add(
-    SystemProgram.createAccountWithSeed({
-      fromPubkey: BackendKeyPair.publicKey,
-      basePubkey: BackendKeyPair.publicKey,
-      seed: SEED,
-      newAccountPubkey: userPubkey,
-      lamports: lamports,
-      space: Space,
-      programId: programId,
-    }),
-  );
-  await sendAndConfirmTransaction(connection, transaction, [BackendKeyPair]);
-  console.log("chreated new PDA");
 }
 
 
@@ -319,7 +281,6 @@ export async function UpdateOrInsertData(key, value, extraArgs = {}) {
   transaction.recentBlockhash = blockhash;
   transaction.feePayer = BaseUserPubkey;
 
-  const signedTransaction = await window.solflare.signTransaction(transaction);
-
+  await sendAndConfirmTransaction(connection, transaction, [BackendKeyPair]);
 
 }

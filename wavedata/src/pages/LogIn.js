@@ -41,8 +41,9 @@ function Login() {
 			if (typeof window.solflare !== "undefined") {
 				await window.solflare.connect();
 				if (window.solflare.isConnected) {
-					window.localStorage.setItem("type", "solflare");
+					window.localStorage.setItem("type", "solana");
 					setisSolanaConnected(true);
+					window.location.reload();
 				} else {
 					setisSolanaConnected(false);
 				}
@@ -117,7 +118,7 @@ function Login() {
 			if (window.localStorage.getItem("type") === "polkadot") {
 				await web3Enable("WaveData");
 				setisPolkadotConnected(true);
-			} else if (window.localStorage.getItem("type") === "solflare") {
+			} else if (window.localStorage.getItem("type") === "solana") {
 				setisSolanaConnected(true);
 			}
 			if (isPolkadotConnected || isSolanaConnected) {

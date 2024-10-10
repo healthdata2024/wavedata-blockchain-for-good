@@ -283,7 +283,8 @@ function StudyDetails() {
 	async function LoadDataInformed() {
 		const studyDataTable = base('study_subjects');
 		const records = await studyDataTable.select({
-			filterByFormula: `{study_id} = '${params.id}'`
+			filterByFormula: `AND({study_id} = '${params.id}', {blockchain} = '${window.localStorage.getItem("type")}')`,
+
 		}).firstPage();
 
 

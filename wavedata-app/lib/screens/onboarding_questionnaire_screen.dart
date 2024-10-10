@@ -28,7 +28,8 @@ class _OnboardingQuestionnaireScreenState
     "Accept": "application/json",
     "Content-Type": "application/x-www-form-urlencoded"
   };
-  String domain = 'https://wavedata-blockchain-for-good.onrender.com';
+  String domain = 'http://localhost:3000';
+  String blockchain = 'polkadot';
   String userid = "";
   var allQuestions = [
     Question(
@@ -75,6 +76,7 @@ class _OnboardingQuestionnaireScreenState
   Future<void> GetData() async {
     final prefs = await SharedPreferences.getInstance();
     userid = prefs.getString("userid").toString();
+    blockchain = prefs.getString("blockchain").toString();
     setState(() {
       isloading = false;
     });
@@ -87,6 +89,7 @@ class _OnboardingQuestionnaireScreenState
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       userid = (prefs.getString("userid").toString());
+      blockchain = prefs.getString("blockchain").toString();
     });
 
     // final UsersDataTable = base('users_data');

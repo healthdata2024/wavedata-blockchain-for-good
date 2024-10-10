@@ -35,7 +35,10 @@ class _CreditScreenState extends ConsumerState<CreditScreen> {
   };
 
   int userid = 0;
-  String domain = 'https://wavedata-blockchain-for-good.onrender.com';
+  String blockchain = 'polkadot';
+
+
+  String domain = 'http://localhost:3000';
 
   Future<void> GetAccountData() async {
     // Obtain shared preferences.
@@ -102,8 +105,9 @@ class _CreditScreenState extends ConsumerState<CreditScreen> {
     Future<void> WithdrawAmount(Amount) async {
       final prefs = await SharedPreferences.getInstance();
       int userid = int.parse(prefs.getString("userid").toString());
-
-      var url = Uri.parse('${domain}/api/POST/Study/Survey/WithdrawAmount');
+      blockchain = prefs.getString("blockchain").toString();
+   
+      var url = Uri.parse('${domain}/api/${blockchain}/POST/Study/Survey/WithdrawAmount');
       await http.post(url, headers: POSTheader, body: {
         'userid': userid.toString(),
         'amount': Amount,

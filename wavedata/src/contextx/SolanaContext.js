@@ -199,7 +199,7 @@ export function SolanaProvider({ children }) {
 	}
 
 	const fetchData = async () => {
-		if (window.localStorage.getItem("type") === "solflare") {
+		if (window.localStorage.getItem("type") === "solana") {
 			try {
 				await window.solflare.connect();
 				// Establish connection to the cluster

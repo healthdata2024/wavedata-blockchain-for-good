@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
 
 
-  let useContract = await import("../../../../../../contract/useContract.ts");
+  let useContract = await import("../../../../../../contract/useContractSolana.js");
   const {api,  signerAddress, sendTransaction, ReadContract} = await useContract.default();
     
   if (req.method !== 'POST') {

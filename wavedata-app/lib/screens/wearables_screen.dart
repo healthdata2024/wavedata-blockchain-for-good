@@ -27,7 +27,8 @@ class _WearablesScreenState extends ConsumerState<WearablesScreen> {
     GetAccountData();
   }
 
-String domain = "https://wavedata-blockchain-for-good.onrender.com";
+  String blockchain = 'polkadot';
+String domain = "http://localhost:3000";
   String userid = "";
   String AccountTokenAddress = "";
   bool hasDevice = false;
@@ -103,7 +104,7 @@ String domain = "https://wavedata-blockchain-for-good.onrender.com";
 
   Future<void> generateLoginLink() async {
     var url = Uri.parse(
-        domain + '/api/GET/Wearable/getSourceLink?userid=1');
+        domain + '/api/${blockchain}/GET/Wearable/getSourceLink?userid=1');
     final response = await http.get(url);
     var responseData = json.decode(response.body);
 
@@ -122,7 +123,7 @@ String domain = "https://wavedata-blockchain-for-good.onrender.com";
         DateTime.now().year, DateTime.now().month, DateTime.now().day - 1));
 
     var url = Uri.parse(
-        domain + '/api/GET/Wearable/customAPI?userid=${userid}&url=https://api.und-gesund.de/v5/dailyDynamicValues&token=${this.AccountTokenAddress}&body_startDay=${startDate}&body_endDay=${endDate}&body_valueTypes=3001');
+        domain + '/api/${blockchain}/GET/Wearable/customAPI?userid=${userid}&url=https://api.und-gesund.de/v5/dailyDynamicValues&token=${this.AccountTokenAddress}&body_startDay=${startDate}&body_endDay=${endDate}&body_valueTypes=3001');
     final response = await http.get(url);
     var responseData = json.decode(response.body);
     var parsed = json.decode(responseData['value']);
@@ -161,7 +162,7 @@ String domain = "https://wavedata-blockchain-for-good.onrender.com";
     // var url = Uri.parse(
     //      domain + '/api/GET/Wearable/customAPI?userid=${userid}&url=https://api.und-gesund.de/v5/dailyDynamicValues&token=${this.AccountTokenAddress}&body_startDay=${startDate}&body_endDay=${endDate}&body_valueTypes=2002,2003,2005');
     var url = Uri.parse(
-         domain + '/api/GET/Wearable/customAPI?userid=${userid}&url=https://api.und-gesund.de/v5/dailyDynamicValues&token=${this.AccountTokenAddress}&body_startDay=${startDate}&body_endDay=${endDate}&body_valueTypes=2001');
+         domain + '/api/${blockchain}/GET/Wearable/customAPI?userid=${userid}&url=https://api.und-gesund.de/v5/dailyDynamicValues&token=${this.AccountTokenAddress}&body_startDay=${startDate}&body_endDay=${endDate}&body_valueTypes=2001');
     final response = await http.get(url);
     var responseData = json.decode(response.body);
     var parsed = json.decode(responseData['value']);
@@ -204,7 +205,7 @@ String domain = "https://wavedata-blockchain-for-good.onrender.com";
     // var startDate = DateFormat('yyyy-MM-dd').format(new DateTime(2023, 01, 11));
     // var endDate = DateFormat('yyyy-MM-dd').format(new DateTime(2023,01,17));
     var url = Uri.parse(
-         domain + '/api/GET/Wearable/customAPI?userid=${userid}&url=https://api.und-gesund.de/v5/dailyDynamicValues&token=${this.AccountTokenAddress}&body_startDay=${startDate}&body_endDay=${endDate}&body_valueTypes=1000');
+         domain + '/api/${blockchain}/GET/Wearable/customAPI?userid=${userid}&url=https://api.und-gesund.de/v5/dailyDynamicValues&token=${this.AccountTokenAddress}&body_startDay=${startDate}&body_endDay=${endDate}&body_valueTypes=1000');
     final response = await http.get(url);
     var responseData = json.decode(response.body);
     var parsed = json.decode(responseData['value']);
@@ -230,7 +231,7 @@ String domain = "https://wavedata-blockchain-for-good.onrender.com";
     // var startDate = DateFormat('yyyy-MM-dd').format(new DateTime(2023, 01,11));
     // var endDate = DateFormat('yyyy-MM-dd').format(new DateTime(2023,01,17));
     var url = Uri.parse(
-         domain + '/api/GET/Wearable/customAPI?userid=${userid}&url=https://api.und-gesund.de/v5/dailyDynamicValues&token=${this.AccountTokenAddress}&body_startDay=${startDate}&body_endDay=${endDate}&body_valueTypes=1010');
+         domain + '/api/${blockchain}/GET/Wearable/customAPI?userid=${userid}&url=https://api.und-gesund.de/v5/dailyDynamicValues&token=${this.AccountTokenAddress}&body_startDay=${startDate}&body_endDay=${endDate}&body_valueTypes=1010');
     final response = await http.get(url);
     var responseData = json.decode(response.body);
     var parsed = json.decode(responseData['value']);

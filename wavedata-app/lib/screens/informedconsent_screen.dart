@@ -38,7 +38,8 @@ class _InformedConsentScreenState extends ConsumerState<InformedConsentScreen> {
     "Accept": "application/json",
     "Content-Type": "application/x-www-form-urlencoded"
   };
-  String baseURL = 'https://wavedata-blockchain-for-good.onrender.com';
+  String baseURL = 'http://localhost:3000';
+  String blockchain = 'polkadot';
 
   var ages_groups = [];
   var study_title = "";
@@ -58,12 +59,15 @@ class _InformedConsentScreenState extends ConsumerState<InformedConsentScreen> {
     final prefs = await SharedPreferences.getInstance();
     String studyid = prefs.getString("studyid").toString();
     String userid = prefs.getString("userid").toString();
+    setState(() {
+      blockchain = prefs.getString("blockchain").toString();
+    });
 
     ages_groups = [];
     subjects = [];
 
     var url = Uri.parse(
-        '${baseURL}/api/GET/Study/GetInformedConsent?study_id=${studyid}&user_id=${userid}');
+        '${baseURL}/api/${blockchain}/GET/Study/GetInformedConsent?study_id=${studyid}&user_id=${userid}');
     final response = await http.get(url);
     var responseData = jsonDecode(response.body);
     var value = jsonDecode(responseData['value']);
@@ -73,7 +77,8 @@ class _InformedConsentScreenState extends ConsumerState<InformedConsentScreen> {
     }).toList();
 
     final studySubjectsTable = base('study_subjects');
-    final filterByFormula = ' {study_id} = \'${studyid}\'';
+      final filterByFormula ='AND({study_id} = \'${studyid}\', {blockchain} = \'${blockchain}\')';
+
     var sort = [
       {"field": "Order_ID", "direction": "asc"}
     ];
@@ -115,7 +120,7 @@ class _InformedConsentScreenState extends ConsumerState<InformedConsentScreen> {
   }
 
   Future<void> FinishIC() async {
-    return; //Hard Coded
+    // return; //Hard Coded
     setState(() {
       LoadingText =
           "Thank you for sending your informed consent. We are now checking the outcomes, which can take around one minute. Please wait";
@@ -126,8 +131,8 @@ class _InformedConsentScreenState extends ConsumerState<InformedConsentScreen> {
     String userid = (prefs.getString("userid").toString());
     String studyid = (study_id);
 
-    var url =
-        Uri.parse('${baseURL}/api/POST/Study/CreateCompletedInformedConsent');
+    var url = Uri.parse(
+        '${baseURL}/api/${blockchain}/POST/Study/CreateCompletedInformedConsent');
     await http.post(url, headers: POSTheader, body: {
       'userid': userid.toString(),
       'date': DateTime.now().toIso8601String(),
@@ -148,7 +153,8 @@ class _InformedConsentScreenState extends ConsumerState<InformedConsentScreen> {
 
     String JsonMadePermission = given_permission.toString();
 
-    var url2 = Uri.parse('${baseURL}/api/POST/Study/CreateOngoingStudy');
+    var url2 =
+        Uri.parse('${baseURL}/api/${blockchain}/POST/Study/CreateOngoingStudy');
     await http.post(url2, headers: POSTheader, body: {
       'studyid': studyid.toString(),
       'userid': userid.toString(),
@@ -589,7 +595,6 @@ class _InformConsentState extends State<InformConsent> {
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             GestureDetector(
               onTap: () async {
-                
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(

@@ -34,7 +34,8 @@ class _ConnectDataScreenState extends ConsumerState<ConnectDataScreen> {
     "Content-Type": "application/x-www-form-urlencoded"
   };
   bool termsBool = false;
-  String baseURL = 'https://wavedata-blockchain-for-good.onrender.com';
+  String baseURL = 'http://localhost:3000';
+  String blockchain = 'polkadot';
 
   @override
   initState() {
@@ -45,8 +46,11 @@ class _ConnectDataScreenState extends ConsumerState<ConnectDataScreen> {
   Future<void> GetData() async {
     final prefs = await SharedPreferences.getInstance();
     var userid = prefs.getString("userid");
+   setState(() {
+       blockchain = prefs.getString("blockchain").toString();
+    });
     var url = Uri.parse(
-        '${baseURL}/api/GET/getFhir?userid=${int.parse(userid.toString())}');
+        '${baseURL}/api/${blockchain}/GET/getFhir?userid=${int.parse(userid.toString())}');
 
     final response = await http.get(url);
     var responseData = json.decode(response.body);
@@ -62,11 +66,14 @@ class _ConnectDataScreenState extends ConsumerState<ConnectDataScreen> {
   }
 
   Future<void> ConnectData() async {
-   
     final prefs = await SharedPreferences.getInstance();
     var userid = prefs.getString("userid");
+    setState(() {
+       blockchain = prefs.getString("blockchain").toString();
+    });
+
     try {
-      var url = Uri.parse('${baseURL}/api/POST/UpdateFhir');
+      var url = Uri.parse('${baseURL}/api/${blockchain}/POST/UpdateFhir');
       final response = await http.post(url, headers: POSTheader, body: {
         'userid': userid,
         'givenname': GivenNameTXT.text,

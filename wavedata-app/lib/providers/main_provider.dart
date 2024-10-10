@@ -8,7 +8,9 @@ import 'package:http/http.dart' as http;
 
 import '../model/study_action.dart';
 
-const domain = 'https://wavedata-blockchain-for-good.onrender.com';
+const domain = 'http://localhost:3000';
+
+String blockchain = 'polkadot';
 
 final mainProvider =
     ChangeNotifierProvider<MainProvider>((ref) => MainProvider());
@@ -42,10 +44,12 @@ class MainProvider extends ChangeNotifier {
   }
 
   Future<void> GetUserData() async {
-       final prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
     int userid = int.parse(prefs.getString("userid").toString());
+    blockchain = prefs.getString("blockchain").toString();
 
-    var url = Uri.parse('${domain}/api/GET/getUserDetails?userid=${userid}');
+    var url = Uri.parse(
+        '${domain}/api/${blockchain}/GET/getUserDetails?userid=${userid}');
     var correctStatus = false;
     var response = null;
     while (correctStatus == false) {
@@ -61,8 +65,7 @@ class MainProvider extends ChangeNotifier {
 
     var dataUD = (responseData['value']);
 
-    userDetails["credits"] =
-        int.parse(dataUD['credits'].toString()) / 1e18;
+    userDetails["credits"] = int.parse(dataUD['credits'].toString()) / 1e18;
     userDetails["walletAddress"] = dataUD['walletAddress'];
 
     updateUserDetails(userDetails);
@@ -96,11 +99,12 @@ class MainProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-var surveyActions =[];
- void updateSurveysActions(data) {
+  var surveyActions = [];
+  void updateSurveysActions(data) {
     surveyActions = data;
     notifyListeners();
   }
+
   Future<void> GetOngoingData() async {
     ongoingStudies = {
       "studyid": -1,
@@ -112,9 +116,10 @@ var surveyActions =[];
     };
     final prefs = await SharedPreferences.getInstance();
     int userid = int.parse(prefs.getString("userid").toString());
+    blockchain = prefs.getString("blockchain").toString();
 
-    var url =
-        Uri.parse('${domain}/api/GET/Study/GetOngoingStudy?userid=${userid}');
+    var url = Uri.parse(
+        '${domain}/api/${blockchain}/GET/Study/GetOngoingStudy?userid=${userid}');
     var correctStatus = false;
     var response = null;
     while (correctStatus == false) {
@@ -155,35 +160,35 @@ var surveyActions =[];
       bool first_today = false;
       var dummyActions = [];
       for (var i = 0; i < SurveyAllElement.length; i++) {
-       var SurveyElement = SurveyAllElement[i];
-          var completedSurvey = SurveyAllCompletedElement.where(
-              (e) => e['survey_id'] == SurveyElement['id']);
-          String timeToday = "Today";
-          if (completedSurvey.length > 0) {
-            var completedData = completedSurvey.toList()[0];
-            String completedDate = completedData['date'];
-            String timeToday =
-                Jiffy(DateTime.parse(completedDate)).fromNow(); // a year ago
-            totalcredit += int.parse(SurveyElement['reward'].toString());
+        var SurveyElement = SurveyAllElement[i];
+        var completedSurvey = SurveyAllCompletedElement.where(
+            (e) => e['survey_id'] == SurveyElement['id']);
+        String timeToday = "Today";
+        if (completedSurvey.length > 0) {
+          var completedData = completedSurvey.toList()[0];
+          String completedDate = completedData['date'];
+          String timeToday =
+              Jiffy(DateTime.parse(completedDate)).fromNow(); // a year ago
+          totalcredit += int.parse(SurveyElement['reward'].toString());
+        }
+        bool status = completedSurvey.length > 0;
+        if (!status) {
+          timeToday = "Tomorrow";
+          if (!first_today) {
+            timeToday = "Today";
+            first_today = true;
           }
-          bool status = completedSurvey.length > 0;
-          if (!status) {
-            timeToday = "Tomorrow";
-            if (!first_today) {
-              timeToday = "Today";
-              first_today = true;
-            }
-          }
-          dummyActions.add(
-            StudyAction(
-                id: SurveyElement['id'].toString(),
-                when: timeToday,
-                content: SurveyElement['name'],
-                isDone: status),
-          );
+        }
+        dummyActions.add(
+          StudyAction(
+              id: SurveyElement['id'].toString(),
+              when: timeToday,
+              content: SurveyElement['name'],
+              isDone: status),
+        );
       }
       updateSurveysActions(dummyActions);
-      
+
       userDetails['ongoingcredit'] = totalcredit;
 
       updateUserDetails(userDetails);

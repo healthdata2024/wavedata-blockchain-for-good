@@ -27,7 +27,8 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
     "Accept": "application/json",
     "Content-Type": "application/x-www-form-urlencoded"
   };
-String domain = 'https://wavedata-blockchain-for-good.onrender.com';
+  String domain = 'http://localhost:3000';
+  String blockchain = 'polkadot';
   String userId = "";
   String StudyId = "";
   String SurveyId = "";
@@ -41,14 +42,16 @@ String domain = 'https://wavedata-blockchain-for-good.onrender.com';
     SurveyId = prefs.getString("surveyid").toString();
     userId = (prefs.getString("userid").toString());
     StudyId = (prefs.getString("studyid").toString());
-  var questionnaireViewmodel = ref.watch(questionnaireProvider);
-  questionnaireViewmodel.updateIndex(0);
+
+    blockchain = prefs.getString("blockchain").toString();
+    var questionnaireViewmodel = ref.watch(questionnaireProvider);
+    questionnaireViewmodel.updateIndex(0);
 
     allSections = [];
     allCategory = [];
 
-var url = Uri.parse(
-        '${domain}/api/GET/Study/Survey/GetSurveyDetails?surveyid=${SurveyId}');
+    var url = Uri.parse(
+        '${domain}/api/${blockchain}/GET/Study/Survey/GetSurveyDetails?surveyid=${SurveyId}');
     final response = await http.get(url);
     var responseData = json.decode(response.body);
 
@@ -96,8 +99,6 @@ var url = Uri.parse(
       }
       isloading = false;
     });
-
-    
   }
 
   Future<void> SaveData(sectionindex) async {
@@ -144,20 +145,18 @@ var url = Uri.parse(
       isloading = true;
     });
     final prefs = await SharedPreferences.getInstance();
-       String surveyid = prefs.getString("surveyid").toString();
+    String surveyid = prefs.getString("surveyid").toString();
     int userid = int.parse(prefs.getString("userid").toString());
     int studyid = int.parse(allSections[0]['studyid']);
 
-
     var url = Uri.parse(
-        '${domain}/api/POST/Study/Survey/CreateCompletedSurvey');
+        '${domain}/api/${blockchain}/POST/Study/Survey/CreateCompletedSurvey');
     await http.post(url, headers: POSTheader, body: {
       'surveyid': surveyid.toString(),
       'userid': userid.toString(),
       'date': DateTime.now().toIso8601String(),
       'studyid': studyid.toString()
     });
-
 
     Future.delayed(const Duration(milliseconds: 1500), () async {
       Navigator.of(context).pop();
@@ -248,7 +247,6 @@ var url = Uri.parse(
                             top: 0, left: 24, right: 24, bottom: 24),
                         child: GestureDetector(
                           onTap: () async {
-                           
                             // await SaveData(e['sectionid']);
                             questionnaireViewmodel.updateIndex(
                                 questionnaireViewmodel.selectedIndex + 1);
