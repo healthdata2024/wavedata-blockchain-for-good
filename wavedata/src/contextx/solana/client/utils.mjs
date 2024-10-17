@@ -3,8 +3,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 
 import {Keypair} from '@solana/web3.js';
-import secretKeyString from '../../../ink_contracts/solana/dist/wavedata-keypair.json';
-import PayerKeyString from '../../../ink_contracts/solana/payer/payer-keypair.json';
+import secretKeyString from '../../../contracts/solana/dist/wavedata-keypair.json';
+import PayerKeyString from '../../../contracts/solana/payer/payer-keypair.json';
 
 
 /**

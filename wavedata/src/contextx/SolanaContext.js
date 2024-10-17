@@ -122,7 +122,7 @@ export function SolanaProvider({ children }) {
 						return _studyAudienceMap[i].audienceInfo ;
 					}
 				}
-				return "{}";
+				return "[]";
 			case "_surveyMap":
 				return (await getMapsFromContract("_surveyMap"))[args[0]];
 			case "_categoryMap":

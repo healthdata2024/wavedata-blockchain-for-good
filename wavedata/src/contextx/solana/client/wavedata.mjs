@@ -299,6 +299,7 @@ export async function UpdateOrInsertData(key, value, extraArgs = {}) {
     programId: programId,
     keys: [
       { pubkey: userPubkey, isSigner: false, isWritable: true },
+      { pubkey: BaseUserPubkey, isSigner: true, isWritable:false },
     ],
     data: Uint8Array.from(buffer_instruction), // All instructions are hellos
   });
