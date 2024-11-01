@@ -12,6 +12,7 @@ const AppContext = createContext({
     CheckEmail: async () => { },
     CreateAccount: async () => { },
     Login: async () => { },
+    CreateDescription: async (description) => { },
     CreateStudy: async () => { },
     UpdateStudy: async () => { },
     UpdateAudience: async () => { },
@@ -112,6 +113,20 @@ export function DBProvider({ children }) {
         }
     }
 
+
+    async function CreateDescription(description){
+               
+        const descriptionTable = base('descriptions');
+        try {
+            const record = await descriptionTable.create({
+                "description": description
+            });
+
+            return record.getId();
+        } catch (error) {
+            throw error;
+        }
+    }
     async function createSurvey(studyId, userId, name, description, date, image, reward) {
         try {
             const surveysTable = base('surveys');
@@ -325,7 +340,7 @@ export function DBProvider({ children }) {
         }
     }
 
-    return <AppContext.Provider value={{ CheckEmail: CheckEmail, CreateAccount: CreateAccount, base: base, Login: Login,CreateOrSaveSections:CreateOrSaveSections, CreateStudy,createSurveyCategory:createSurveyCategory, UpdateStudy, UpdateAudience: UpdateAudience, UpdateReward: UpdateReward, UpdateAges: UpdateAges, UpdateStudyTitle: UpdateStudyTitle, CreateSubject: CreateSubject, UpdateSubject: UpdateSubject, createSurvey: createSurvey, updateSurvey: updateSurvey }}>{children}</AppContext.Provider>;
+    return <AppContext.Provider value={{ CheckEmail: CheckEmail, CreateAccount: CreateAccount, base: base, Login: Login,CreateOrSaveSections:CreateOrSaveSections, CreateStudy, CreateDescription,createSurveyCategory:createSurveyCategory, UpdateStudy, UpdateAudience: UpdateAudience, UpdateReward: UpdateReward, UpdateAges: UpdateAges, UpdateStudyTitle: UpdateStudyTitle, CreateSubject: CreateSubject, UpdateSubject: UpdateSubject, createSurvey: createSurvey, updateSurvey: updateSurvey }}>{children}</AppContext.Provider>;
 
 }
 

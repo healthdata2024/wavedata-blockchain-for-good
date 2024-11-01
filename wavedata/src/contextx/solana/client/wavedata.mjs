@@ -30,7 +30,7 @@ import { createKeypairFromFile, getPayerFromFile } from './utils.mjs';
 let connection;
 
 
-let Space = 4000000;
+let Space = 40000;
 // Derive the address (public key) of a user account from the program so that it's easy to find later.
 const SEED = "Hello";
 
