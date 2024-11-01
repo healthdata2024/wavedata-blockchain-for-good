@@ -30,7 +30,7 @@ import { createKeypairFromFile, getPayerFromFile } from './utils.mjs';
 let connection;
 
 
-let Space = 40000;
+let Space = 4000000;
 // Derive the address (public key) of a user account from the program so that it's easy to find later.
 const SEED = "Hello";
 
@@ -44,8 +44,8 @@ let BackendKeyPair;
 /**
  * The public key of the user account
  */
-let userPubkey;
-let BaseUserPubkey;
+let programPubkey;
+let BrowserUserPubkey;
 
 
 // Flexible class that takes properties and imbues them
@@ -80,7 +80,7 @@ export async function establishConnection() {
   let rpc = "https://nd-579-723-764.p2pify.com/5dc1aedbd31cca7d6cc1c8520d0822f4";
   let ws = "wss://ws-nd-579-723-764.p2pify.com/5dc1aedbd31cca7d6cc1c8520d0822f4";
   connection = new Connection(rpc, {wsEndpoint:ws});
-  BaseUserPubkey = window.solflare.publicKey;
+  BrowserUserPubkey = window.solflare.publicKey;
 }
 
 
@@ -198,7 +198,7 @@ return;
 export async function CreateNewPDA(checkMode = false) {
 
 
-  userPubkey = await PublicKey.createWithSeed(
+  programPubkey = await PublicKey.createWithSeed(
     BackendKeyPair.publicKey,
     SEED,
     programId,
@@ -218,7 +218,7 @@ export async function CreateNewPDA(checkMode = false) {
       fromPubkey: BackendKeyPair.publicKey,
       basePubkey: BackendKeyPair.publicKey,
       seed: SEED,
-      newAccountPubkey: userPubkey,
+      newAccountPubkey: programPubkey,
       lamports: lamports,
       space: Space,
       programId: programId,
@@ -243,7 +243,7 @@ export async function InitializeState() {
 
   const instruction = new TransactionInstruction({
     keys: [
-      { pubkey: userPubkey, isSigner: false, isWritable: true },
+      { pubkey: programPubkey, isSigner: false, isWritable: true },
     ],
     programId: programId,
     data: Uint8Array.from(buffer_instruction),
@@ -278,7 +278,7 @@ export async function getAccountData(connection, account) {
  * Get Output
  */
 export async function getOutput() {
-  const account = await getAccountData(connection, userPubkey);
+  const account = await getAccountData(connection, programPubkey);
   return account;
 
 }
@@ -300,8 +300,8 @@ export async function UpdateOrInsertData(key, value, extraArgs = {}) {
   const instruction = new TransactionInstruction({
     programId: programId,
     keys: [
-      { pubkey: userPubkey, isSigner: false, isWritable: true },
-      { pubkey: BaseUserPubkey, isSigner: true, isWritable:false },
+      { pubkey: programPubkey, isSigner: false, isWritable: true },
+      { pubkey: BrowserUserPubkey, isSigner: true, isWritable:false },
     ],
     data: Uint8Array.from(buffer_instruction), // All instructions are hellos
   });
@@ -311,8 +311,8 @@ export async function UpdateOrInsertData(key, value, extraArgs = {}) {
   if (extraArgs.send == true) {
 
     const params = {
-      fromPubkey: BaseUserPubkey,
-      toPubkey: userPubkey,
+      fromPubkey: BrowserUserPubkey,
+      toPubkey: programPubkey,
       lamports: extraArgs.lamports,
     };
     transaction.add(SystemProgram.transfer(params));
@@ -320,7 +320,7 @@ export async function UpdateOrInsertData(key, value, extraArgs = {}) {
   }
   let { blockhash } = await connection.getLatestBlockhash();
   transaction.recentBlockhash = blockhash;
-  transaction.feePayer = BaseUserPubkey;
+  transaction.feePayer = BrowserUserPubkey;
 
   const signedTransaction = await window.solflare.signTransaction(transaction);
 
