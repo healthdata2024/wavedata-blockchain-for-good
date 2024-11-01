@@ -21,12 +21,7 @@ pub fn process_instruction(
     // Get the account to say hello to
     let account = next_account_info(accounts_iter)?;
 
-    // The account must be owned by the program in order to modify its data
-    if account.owner != program_id {
-        msg!("Greeted account does not have the correct program id");
-        return Err(ProgramError::IncorrectProgramId);
-    }
-
+    
 
     let data = match std::str::from_utf8(instruction_data) {
         Ok(v) => v,

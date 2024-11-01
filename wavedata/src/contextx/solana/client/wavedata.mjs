@@ -30,8 +30,9 @@ import { createKeypairFromFile, getPayerFromFile } from './utils.mjs';
 let connection;
 
 
+let Space = 4000;
 // Derive the address (public key) of a user account from the program so that it's easy to find later.
-const SEED = "Wavedata";
+const SEED = "Hello";
 
 /**
  * Our program id
@@ -163,9 +164,9 @@ export async function getTransferMessage() {
 export async function establishPayer() {
   let fees = 0;
 
-
+return;
   // Calculate the cost to fund the greeter account
-  fees += await connection.getMinimumBalanceForRentExemption(4000000);
+  fees += await connection.getMinimumBalanceForRentExemption(Space);
 
   const message = (await getTransferMessage());
 
@@ -209,8 +210,8 @@ export async function CreateNewPDA(checkMode = false) {
     return;
   } catch (err) { }
 
-  let Space = 4000000;
   const lamports = await connection.getMinimumBalanceForRentExemption(Space);
+
 
   const transaction = new Transaction().add(
     SystemProgram.createAccountWithSeed({
