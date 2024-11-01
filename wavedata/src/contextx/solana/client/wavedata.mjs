@@ -31,7 +31,7 @@ let connection;
 
 
 // Derive the address (public key) of a user account from the program so that it's easy to find later.
-const SEED = "Hello";
+const SEED = "Wavedata";
 
 /**
  * Our program id
@@ -77,7 +77,8 @@ const dataSchema = new Map([
 */
 export async function establishConnection() {
   let rpc = "https://nd-579-723-764.p2pify.com/5dc1aedbd31cca7d6cc1c8520d0822f4";
-  connection = new Connection(rpc, 'confirmed');
+  let ws = "wss://ws-nd-579-723-764.p2pify.com/5dc1aedbd31cca7d6cc1c8520d0822f4";
+  connection = new Connection(rpc, {wsEndpoint:ws});
   BaseUserPubkey = window.solflare.publicKey;
 }
 
