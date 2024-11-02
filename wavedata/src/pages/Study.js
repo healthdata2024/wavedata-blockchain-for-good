@@ -2,7 +2,7 @@ import { PlusSmIcon, ArrowRightIcon, UserIcon, CurrencyDollarIcon, GlobeAltIcon 
 import { useEffect, useState } from "react";
 import CreateStudyModal from "../components/modal/CreateStudy.jsx";
 import { useDBContext } from '../contextx/DBContext.js'
-import {useMixedContext} from "../contextx/MixedContext.js";
+import { useMixedContext } from "../contextx/MixedContext.js";
 import "./Study.css";
 
 let isLoadingData = false;
@@ -10,8 +10,8 @@ function Studies() {
 	const [data, setData] = useState([]);
 	const [CreatemodalShow, setModalShow] = useState(false);
 	const [Loading, setLoading] = useState(true);
-	const {  api,contract, signerAddress, ReadContractByQuery,getMessage,getQuery } = useMixedContext();;
-	const { base } = useDBContext();
+	const { api, contract, signerAddress, ReadContractByQuery, getMessage, getQuery } = useMixedContext();;
+	const { GetDescription } = useDBContext();
 	const addStudy = () => {
 		setModalShow(true);
 	};
@@ -22,27 +22,30 @@ function Studies() {
 	});
 
 	async function LoadData() {
-		if (!isLoadingData && contract !=null) {
+		if (!isLoadingData && contract != null) {
 			isLoadingData = true;
 			setLoading(true);
 
-			const totalStudys = await ReadContractByQuery( getQuery("_StudyIds"))
-    
+			const totalStudys = await ReadContractByQuery(getQuery("_StudyIds"))
+
 			let arr = [];
 			for (let i = 0; i < Number(totalStudys); i++) {
-				let study_element = await ReadContractByQuery( getQuery("_studyMap"),[i])
+				let study_element = await ReadContractByQuery(getQuery("_studyMap"), [i])
 				let allAudiences = [];
 				try {
-					allAudiences = JSON.parse( await ReadContractByQuery( getQuery("_studyAudienceMap"),[i]) );
-				} catch (e) {}
+					allAudiences = JSON.parse(await ReadContractByQuery(getQuery("_studyAudienceMap"), [i]));
+				} catch (e) { }
+
+				let study_description = await GetDescription(study_element.description);
+
 				var newStudy = {
 					id: Number(study_element.studyId),
 					title: study_element.title,
 					image: study_element.image,
-					description: study_element.description,
+					description: study_description,
 					contributors: Number(study_element.contributors),
 					audience: Number(allAudiences.length),
-					budget: window.ParseBigNum(study_element.budget) ,
+					budget: window.ParseBigNum(study_element.budget),
 					rewardtype: study_element.rewardType
 				};
 				arr.push(newStudy)
@@ -75,10 +78,10 @@ function Studies() {
 					<p className="text-white ml-2">Add Study</p>
 				</button>
 			</div>
-			{data.length !=0 ? (
+			{data.length != 0 ? (
 				<>
 					{data.map(({ id, title, image, description, contributors, audience, budget, rewardtype }, index) => {
-						const IS_LAST = index + 1 ===data.length;
+						const IS_LAST = index + 1 === data.length;
 						return (
 							<div key={index} className={`bg-white border border-gray-400 rounded-lg study-container overflow-hidden ${!IS_LAST && "mb-2"}`}>
 								<div className="flex p-6">
@@ -100,16 +103,16 @@ function Studies() {
 										<GlobeAltIcon className="w-5 h-5 text-gray-500" />
 										{screenSize.dynamicWidth > 760 ? <p className="text-gray-500 font-semibold ml-1">{`${audience} audience(s)`}</p> : <p className="text-gray-500 font-semibold ml-1">{`${audience}`}</p>}
 									</div>
-									 <div className="flex items-center ml-6">
+									<div className="flex items-center ml-6">
 										<CurrencyDollarIcon className="w-5 h-5 text-gray-500" />
 										{screenSize.dynamicWidth > 760 ? <p className="text-gray-500 font-semibold ml-1">{`Budget of ${budget} ${rewardtype}`}</p> : <p className="text-gray-500 font-semibold ml-1">{`${budget} ${rewardtype}`}</p>}
-									</div> 
+									</div>
 								</div>
 							</div>
 						);
 					})}
 				</>
-			) : Loading ===true ? (
+			) : Loading === true ? (
 				<p className="alert alert-info font-semibold text-3xl text-center">Loading...</p>
 			) : (
 				<p className="alert alert-info font-semibold text-3xl text-center">No Studies</p>

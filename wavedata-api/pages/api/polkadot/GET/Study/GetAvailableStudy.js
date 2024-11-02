@@ -5,6 +5,7 @@ export default async function handler(req, res) {
     await FixCors.default(res);
   } catch (error) { }
 
+  let {GetDescription} = await import ("../../../../../context/DBContext.js");
   let useContract = await import("../../../../../contract/useContract.ts");
   const { api, contract, signerAddress, ParseBigNum, sendTransaction, ReadContractByQuery, getMessage, getQuery } = await useContract.default();
   let study_id = await ReadContractByQuery(api, signerAddress, getQuery(contract, "GetOngoingStudy"), [Number(req.query.userid)]);
@@ -15,7 +16,7 @@ export default async function handler(req, res) {
     let study_element = await ReadContractByQuery(api, signerAddress, getQuery(contract, "_studyMap"), [Number(i)]);
     let ages_groups = {};
     try {
-      ages_groups = JSON.parse(study_element.ages);
+      ages_groups = JSON.parse(await GetDescription(study_element.ages));
     } catch (e) {
       ages_groups = {};
     }
@@ -23,7 +24,7 @@ export default async function handler(req, res) {
 
     let allTitles = { ages_ans: {} };
     try {
-      allTitles.ages_ans = JSON.parse(study_element.titles);
+      allTitles.ages_ans = JSON.parse(await GetDescription(study_element.titles));
     } catch (e) {
       allTitles = { ages_ans: {} };
     }
@@ -55,11 +56,11 @@ export default async function handler(req, res) {
       id: Number(study_element.studyId),
       title: study_element.title,
       image: study_element.image,
-      description: study_element.description,
+      description: await GetDescription(study_element.description),
       contributors: Number(study_element.contributors),
       audience: Number(study_element.audience),
       budget: ParseBigNum(study_element.budget),
-      permissions: (study_element.permission),
+      permissions: await GetDescription(study_element.permission),
       study_title: study_element.title,
       subjects: draft_subjects,
       ages_groups: ages_groups

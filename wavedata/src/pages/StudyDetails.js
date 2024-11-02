@@ -14,12 +14,15 @@ function StudyDetails() {
 
 	const params = useParams();
 	const navigate = useNavigate();
-	const {CreateSubject,UpdateSubject,base} = useDBContext();
+	const {CreateSubject,UpdateSubject,base,GetDescription,CreateDescription} = useDBContext();
 	const { api, contract, signerAddress, sendTransaction,  ReadContractByQuery, getMessage, getQuery } = useMixedContext();;
 	const [tabIndex, setTabIndex] = useState(0);
 	const [UpdatemodalShow, setModalShow] = useState(false);
 	const [CreateSurveymodalShow, setSurveyModalShow] = useState(false);
 	const [LoadingSurvey, setLoadingSurvey] = useState(false);
+	const [agesDescriptionId,setAgesDescriptionId] = useState("");
+	const [titlesDescriptionId,setTitlesDescriptionId] = useState("");
+   
 	const [LoadingInformed, setLoadingInformed] = useState(false);
 	const [SelectedContributorId, setSelectedContributorId] = useState(0);
 	const [Selected_ongoing_id, setSelected_ongoing_id] = useState(0);
@@ -101,7 +104,9 @@ function StudyDetails() {
 	};
 	async function UpdateAgesHandle(event) {
 		DisableButton("AgeSave");
-		await sendTransaction( "UpdateStudyAges", [Number(params.id), JSON.stringify(agesData)]);
+		let ages_id = await CreateDescription(JSON.stringify(agesData),agesDescriptionId);
+		setAgesDescriptionId(ages_id);
+		await sendTransaction( "UpdateStudyAges", [Number(params.id), ages_id]);
 
 		EnableButton("AgeSave");
 	}
@@ -169,8 +174,10 @@ function StudyDetails() {
 
 	async function UpdateStudyTitleHandle() {
 		DisableButton("StudyTitleSave");
-		console.log("UpdateStudyTitleHandle");
-		await sendTransaction( "CreateOrSaveStudyTitle", [Number(params.id), JSON.stringify(studyTitle.ages_ans)]);
+		let titles_id = await CreateDescription(JSON.stringify(studyTitle.ages_ans),titlesDescriptionId);
+		setTitlesDescriptionId(titlesDescriptionId);
+		
+		await sendTransaction( "CreateOrSaveStudyTitle", [Number(params.id),titles_id]);
 
 		EnableButton("StudyTitleSave");
 	}
@@ -246,16 +253,19 @@ function StudyDetails() {
 
 			let allAges = [];
 			try {
-				if (study_element.ages !== '[]')
-					allAges = JSON.parse(study_element.ages);
+				if (study_element.ages !== '[]' && study_element.ages !== ''){
+					allAges = JSON.parse(await GetDescription(study_element.ages));
+					setAgesDescriptionId(study_element.ages);
+				}
 			} catch (e) { }
 			setAgesData(allAges)
 
-
 			let allTitles = { ages_ans: {} };
 			try {
-				if (study_element.titles !== '[]')
-					allTitles.ages_ans = JSON.parse(study_element.titles);
+				if (study_element.titles !== '[]' && study_element.titles !== ''){
+					allTitles.ages_ans = JSON.parse(await GetDescription(study_element.titles));
+					setTitlesDescriptionId(study_element.titles);
+				}
 			} catch (e) { }
 
 			setStudyTitle(allTitles)
@@ -263,11 +273,13 @@ function StudyDetails() {
 			let allAudiences = await LoadStudyData()
 
 
+			let study_description = await GetDescription(study_element.description);
+
 			var newStudy = {
 				id: Number(study_element.studyId),
 				title: study_element.title,
 				image: study_element.image,
-				description: study_element.description,
+				description: study_description,
 				contributors: Number(study_element.contributors),
 				audience: Number(allAudiences.length),
 				budget: window.ParseBigNum(study_element.budget),
@@ -425,7 +437,7 @@ function StudyDetails() {
 							study_id: Number(survey_element.studyId),
 							user_id: Number(survey_element.userId),
 							name: survey_element.name,
-							description: survey_element.description,
+							description: await GetDescription( survey_element.description),
 							date: survey_element.date,
 							image: survey_element.image,
 							reward: window.ParseBigNum(survey_element.reward),

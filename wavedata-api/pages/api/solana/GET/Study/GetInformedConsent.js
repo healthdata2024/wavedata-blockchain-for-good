@@ -6,6 +6,7 @@ export default async function handler(req, res) {
     } catch (error) { }
 
     let useContract = await import("../../../../../contract/useContractSolana.js");
+    let {GetDescription} = await import("../../../../../context/DBContext.js");
     const { api, contract, signerAddress,ParseBigNum, sendTransaction, ReadContract, getMessage, getQuery } = await useContract.default();
     const { study_id, user_id } = req.query;
 
@@ -20,7 +21,7 @@ export default async function handler(req, res) {
 
     //Load Ages
     let ages_Data_element = study_element.ages
-    let ages_groups = (ages_Data_element == "" ? [] : JSON.parse(ages_Data_element));
+    let ages_groups = (ages_Data_element == "" ? [] : JSON.parse(await GetDescription(study_element.ages)));
 
 
     //Elligible Age
@@ -41,13 +42,12 @@ export default async function handler(req, res) {
     let study_title = {};
 
     let study_Data_element = study_element.titles
-    let parsed_study = JSON.parse(study_Data_element);
     try {
 
         if (study_Data_element == "") {
             study_title = {};
         } else {
-            study_title = parsed_study;
+            study_title = JSON.parse(await GetDescription(study_element.titles));
         }
     } catch (e) {
         study_title = {};

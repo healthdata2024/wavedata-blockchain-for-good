@@ -10,7 +10,7 @@ import "./CreateStudy.css";
 import { useDBContext } from "../../contextx/DBContext.js";
 
 export default function CreateStudyModal({show, onHide}) {
-	const { api, contract, signerAddress, sendTransaction,  ReadContractByQuery, getMessage, getQuery, getTX } = useMixedContext();;
+	const { api, contract, signerAddress, sendTransaction,   ReadContractByQuery, getMessage, getQuery, getTX } = useMixedContext();;
 	const {CreateDescription} = useDBContext();
 	function DOMRegex(regex) {
 		let output = [];
@@ -44,7 +44,8 @@ export default function CreateStudyModal({show, onHide}) {
 		createBTN.disabled = true;
 		try {
 			let descriptionId = await CreateDescription(description.value);
-			await sendTransaction( "CreateStudy", [Number(Cookies.get("userid")), image.value, title.value, descriptionId, JSON.stringify(permissionData), 0, 0, window.WrapBigNum( parseInt(budget.value))])
+			let permissiondataId =  await CreateDescription(JSON.stringify(permissionData));
+			await sendTransaction( "CreateStudy", [Number(Cookies.get("userid")), image.value, title.value, descriptionId, permissiondataId, 0, 0, window.WrapBigNum( parseInt(budget.value))])
 			notificationSuccess.style.display = "block";
 			createBTN.children[0].classList.add("hidden");
 			createBTN.children[1].innerText = "Create Study";

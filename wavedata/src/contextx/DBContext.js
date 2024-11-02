@@ -12,7 +12,9 @@ const AppContext = createContext({
     CheckEmail: async () => { },
     CreateAccount: async () => { },
     Login: async () => { },
-    CreateDescription: async (description) => { },
+    CreateDescription: async (description,id="") => { },
+    UpdateDescription: async (id, description) => { },
+    GetDescription: async (id) => "",
     CreateStudy: async () => { },
     UpdateStudy: async () => { },
     UpdateAudience: async () => { },
@@ -52,6 +54,7 @@ export function DBProvider({ children }) {
             return 'Error checking email';
         }
     }
+
     // Function to create a new user account in Airtable
     async function CreateAccount(full_name, email, password) {
         try {
@@ -77,7 +80,7 @@ export function DBProvider({ children }) {
                 maxRecords: 1,
             }).firstPage();
 
-            if (records.length ===1) {
+            if (records.length === 1) {
                 return records[0].getId();
             } else {
                 return 'False'; // User not found or credentials are incorrect
@@ -88,8 +91,8 @@ export function DBProvider({ children }) {
     }
     // Function to create a new study in Airtable
     async function CreateStudy(userId, image, title, description, permission, contributors, audience, budget) {
-        
-        
+
+
         const studiesTable = base('studies');
 
         try {
@@ -114,8 +117,11 @@ export function DBProvider({ children }) {
     }
 
 
-    async function CreateDescription(description){
-               
+    async function CreateDescription(description,id="") {
+
+        if (id != ""){
+           return await UpdateDescription(id,description);
+        }
         const descriptionTable = base('descriptions');
         try {
             const record = await descriptionTable.create({
@@ -126,6 +132,22 @@ export function DBProvider({ children }) {
         } catch (error) {
             throw error;
         }
+    }
+    async function GetDescription(id) {
+        const descriptionTable = base('descriptions');
+
+        const record = await descriptionTable.find(id);
+
+        return record.get("description");
+    }
+    async function UpdateDescription(id, description) {
+        const descriptionTable = base('descriptions');
+
+        await descriptionTable.update(id, {
+            'description': description
+        });
+        return id;
+
     }
     async function createSurvey(studyId, userId, name, description, date, image, reward) {
         try {
@@ -191,8 +213,8 @@ export function DBProvider({ children }) {
 
         const studyTable = base('studies');
 
-        studyTable.update(studyId,{
-            "audience":JSON.parse(audience_info).length
+        studyTable.update(studyId, {
+            "audience": JSON.parse(audience_info).length
         });
 
     }
@@ -257,7 +279,7 @@ export function DBProvider({ children }) {
         const newSubject = {
             'study_id': studyId,
             'subject_index_id': subjectIndexId,
-            'blockchain':window.localStorage.getItem("type"),
+            'blockchain': window.localStorage.getItem("type"),
             'title': title,
             'ages_ans': agesAns
         };
@@ -340,7 +362,7 @@ export function DBProvider({ children }) {
         }
     }
 
-    return <AppContext.Provider value={{ CheckEmail: CheckEmail, CreateAccount: CreateAccount, base: base, Login: Login,CreateOrSaveSections:CreateOrSaveSections, CreateStudy, CreateDescription,createSurveyCategory:createSurveyCategory, UpdateStudy, UpdateAudience: UpdateAudience, UpdateReward: UpdateReward, UpdateAges: UpdateAges, UpdateStudyTitle: UpdateStudyTitle, CreateSubject: CreateSubject, UpdateSubject: UpdateSubject, createSurvey: createSurvey, updateSurvey: updateSurvey }}>{children}</AppContext.Provider>;
+    return <AppContext.Provider value={{ CheckEmail: CheckEmail, CreateAccount: CreateAccount, base: base, Login: Login, CreateOrSaveSections: CreateOrSaveSections, CreateStudy,UpdateDescription, CreateDescription, GetDescription, createSurveyCategory: createSurveyCategory, UpdateStudy, UpdateAudience: UpdateAudience, UpdateReward: UpdateReward, UpdateAges: UpdateAges, UpdateStudyTitle: UpdateStudyTitle, CreateSubject: CreateSubject, UpdateSubject: UpdateSubject, createSurvey: createSurvey, updateSurvey: updateSurvey }}>{children}</AppContext.Provider>;
 
 }
 

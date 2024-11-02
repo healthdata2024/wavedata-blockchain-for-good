@@ -5,6 +5,7 @@ export default async function handler(req, res) {
     await FixCors.default(res);
   } catch (error) {}
 
+  let {GetDescription} = await import ("../../../../../context/DBContext.js");
   let useContract = await import("../../../../../contract/useContractSolana.js");
 	const {api,  signerAddress, sendTransaction, ReadContract} = await useContract.default();
 
@@ -16,7 +17,7 @@ export default async function handler(req, res) {
       id: Number(study_element.studyId),
       title: study_element.title,
       image: study_element.image,
-      description: study_element.description,
+      description: await GetDescription(study_element.description),
       contributors: Number(study_element.contributors),
       audience: Number(study_element.audience),
       budget: Number(study_element.budget)
@@ -32,7 +33,7 @@ export default async function handler(req, res) {
         study_id: Number(survey_element.studyId),
         user_id: Number(survey_element.userId),
         name: survey_element.name,
-        description: survey_element.description,
+        description: await GetDescription(survey_element.description),
         date: survey_element.date,
         image: survey_element.image,
         reward: Number(survey_element.reward),

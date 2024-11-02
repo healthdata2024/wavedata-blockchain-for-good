@@ -4,6 +4,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { CurrencyDollarIcon } from "@heroicons/react/solid";
 import {useMixedContext} from "../../contextx/MixedContext.js";
+import { useDBContext } from '../../contextx/DBContext.js';
 
 export default function UpdateStudyModal({
     show,
@@ -11,8 +12,8 @@ export default function UpdateStudyModal({
     id
 }) {
     const {  api,contract, signerAddress, sendTransaction,ReadContractByQuery,getMessage,getQuery,getTX } = useMixedContext();;
- 
-
+    const {GetDescription,UpdateDescription} = useDBContext();
+    const [descriptionId,setDescriptionId] = useState("");
    
     async function UpdateStudyHandle(e) {
         e.preventDefault();
@@ -24,7 +25,8 @@ export default function UpdateStudyModal({
         updateBTN.disabled = true;
 
         try {
-            await sendTransaction( "UpdateStudy",[Number(id),image.value,title.value,description.value, window.WrapBigNum(parseInt(budget.value))]);
+            await UpdateDescription(descriptionId,description.value);
+            await sendTransaction( "UpdateStudy",[Number(id),image.value,title.value,descriptionId, window.WrapBigNum(parseInt(budget.value))]);
             
             notificationSuccess.style.display = "block";
             updateBTN.children[0].classList.add("hidden")
@@ -49,11 +51,14 @@ export default function UpdateStudyModal({
         if (typeof window?.contract !== 'undefined' && api !== null) {
             try {
                 let study_element = await ReadContractByQuery( getQuery("_studyMap"), [parseInt(id)]);
+                setDescriptionId(study_element.description);
+                let descriptionText = await GetDescription(study_element.description);
+
                 var newStudy = {
                     id: Number(study_element.studyId),
                     title: study_element.title,
                     image: study_element.image,
-                    description: study_element.description,
+                    description: descriptionText,
                     contributors: Number(study_element.contributors),
                     audience: Number(study_element.audience),
                     budget: window.ParseBigNum(study_element.budget) 

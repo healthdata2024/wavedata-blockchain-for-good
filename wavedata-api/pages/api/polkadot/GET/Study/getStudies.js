@@ -5,6 +5,7 @@ export default async function handler(req, res) {
     await FixCors.default(res);
   } catch (error) {}
   
+  let {GetDescription} = await import ("../../../../../context/DBContext.js");
   let useContract = await import("../../../../../contract/useContract.ts");
   const {api, contract, signerAddress,ParseBigNum, sendTransaction, ReadContractByQuery, getMessage, getQuery} = await useContract.default();
 
@@ -12,7 +13,7 @@ export default async function handler(req, res) {
   let TotalStudies = await ReadContractByQuery(api, signerAddress, getQuery(contract,"_StudyIds"));
   for (let i = 0; i < Number(TotalStudies); i++) {
     let study_element = await ReadContractByQuery(api, signerAddress, getQuery(contract,"_studyMap"), [Number(i)]);
-    let study_title = JSON.parse(study_element.titles);
+    let study_title = JSON.parse(await GetDescription(study_element.titles));
     const totalSubjects = await ReadContractByQuery(api, signerAddress, getQuery(contract,"_StudySubjectsIds"));
 		let draft_subjects = [];
 		try {
@@ -37,11 +38,11 @@ export default async function handler(req, res) {
       id: Number(study_element.studyId),
       title: study_element.title,
       image: study_element.image,
-      description: study_element.description,
+      description: await GetDescription(study_element.description),
       contributors: Number(study_element.contributors),
       audience: Number(study_element.audience),
       budget: ParseBigNum(study_element.budget) ,
-      permissions: study_element.permission,
+      permissions: await GetDescription(study_element.permission),
       study_title:study_title,
       subjects:draft_subjects
     };

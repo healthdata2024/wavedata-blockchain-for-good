@@ -61,6 +61,9 @@ export default async function useContractSolana() {
 			case "UpdateAudience":
 				await UpdateAudience.apply(this, args);
 				break;
+			case "UpdateStudyAges":
+				await UpdateStudyAges.apply(this, args);
+				break;
 			case "UpdateUser":
 				await UpdateUser.apply(this, args);
 				break;
@@ -478,6 +481,19 @@ export async function UpdateAudience(studyId, audienceInfo) {
 	}
 	await UpdateOrInsertData('_studyAudienceMap', JSON.stringify(_studyAudienceMap));
 
+}
+
+
+export async function UpdateStudyAges(studyId, agesInfo) {
+	let db = await getOutput();
+	let _studyMap = db.map.get("_studyMap") !== undefined ? JSON.parse(db.map.get("_studyMap")) : [];
+	for (let i = 0; i < _studyMap.length; i++) {
+		const element = _studyMap[i];
+		if (studyId === element.studyId) {
+			_studyMap[i].ages = agesInfo;
+		}
+	}
+	await UpdateOrInsertData('_studyMap', JSON.stringify(_studyMap));
 }
 
 export async function UpdateUser(userId, image, credits) {

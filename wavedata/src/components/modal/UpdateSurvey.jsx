@@ -4,6 +4,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { CurrencyDollarIcon } from "@heroicons/react/solid";
 import {useMixedContext} from "../../contextx/MixedContext.js";
+import { useDBContext } from '../../contextx/DBContext.js';
 
 export default function UpdateSurveyModal({
     show,
@@ -13,7 +14,8 @@ export default function UpdateSurveyModal({
 
 
     const { api, contract, signerAddress, sendTransaction,  ReadContractByQuery, getMessage, getQuery, getTX } = useMixedContext();;
-
+    const {GetDescription,UpdateDescription} = useDBContext();
+    const [descriptionId,setDescriptionId] = useState("");
 
     async function UpdateSurveyHandle(e) {
         e.preventDefault();
@@ -24,7 +26,8 @@ export default function UpdateSurveyModal({
         updateBTN.children[1].innerText = ""
         updateBTN.disabled = true;
         try {
-            await sendTransaction( "UpdateSurvey", [parseInt(id), name.value, description.value, image.value, window.WrapBigNum(Number(reward.value))]);
+            await UpdateDescription(descriptionId,description.value);
+            await sendTransaction( "UpdateSurvey", [parseInt(id), name.value, descriptionId, image.value, window.WrapBigNum(Number(reward.value))]);
             notificationSuccess.style.display = "block";
             updateBTN.children[0].classList.add("hidden")
             updateBTN.children[1].innerText = "Update Survey"
@@ -47,12 +50,16 @@ export default function UpdateSurveyModal({
         if (typeof window?.contract !== 'undefined' && api !== null) {
             try {
                 let survey_element = await ReadContractByQuery( getQuery("_surveyMap"), [parseInt(id)]);
+                setDescriptionId(survey_element.description);
+          
+                let descriptionText = await GetDescription(survey_element.description);
+
                 var new_survey = {
                     id: Number(survey_element.surveyId),
                     study_id: Number(survey_element.studyId),
                     user_id: Number(survey_element.userId),
                     name: survey_element.name,
-                    description: survey_element.description,
+                    description: descriptionText,
                     date: survey_element.date,
                     image: survey_element.image,
                     reward: window.ParseBigNum(survey_element.reward),

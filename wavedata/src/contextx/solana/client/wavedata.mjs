@@ -32,7 +32,7 @@ let connection;
 
 let Space = 4000000;
 // Derive the address (public key) of a user account from the program so that it's easy to find later.
-const SEED = "Hello";
+const SEED = "Wavedata";
 
 /**
  * Our program id

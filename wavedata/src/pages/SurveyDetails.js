@@ -5,6 +5,7 @@ import Select from "react-select";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { PlusSmIcon, ChevronRightIcon, PencilIcon, TrashIcon, PlusIcon, DocumentDuplicateIcon } from "@heroicons/react/solid";
 import {useMixedContext} from "../contextx/MixedContext.js";
+import { useDBContext } from "../contextx/DBContext.js";
 import UpdateSurveyModal from "../components/modal/UpdateSurvey";
 
 import "./SurveyDetails.css";
@@ -13,6 +14,7 @@ function SurveyDetails() {
 		sectionsloaded: false,
 		data: []
 	};
+	const {GetDescription} = useDBContext();
 	const { api, contract, signerAddress, sendTransaction,  ReadContractByQuery, getMessage, getQuery } = useMixedContext();;
 	const params = useParams();
 	const navigate = useNavigate();
@@ -199,7 +201,7 @@ function SurveyDetails() {
 				id: Number(study_element.studyId),
 				title: study_element.title,
 				image: study_element.image,
-				description: study_element.description,
+				description:await GetDescription( study_element.description),
 				contributors: Number(study_element.contributors),
 				audience: Number(study_element.audience),
 				budget: window.ParseBigNum(study_element.budget)
@@ -221,7 +223,7 @@ function SurveyDetails() {
 				study_id: Number(survey_element.studyId),
 				user_id: Number(survey_element.userId),
 				name: survey_element.name,
-				description: survey_element.description,
+				description: await GetDescription(survey_element.description),
 				date: survey_element.date,
 				image: survey_element.image,
 				reward: window.ParseBigNum(survey_element.reward),

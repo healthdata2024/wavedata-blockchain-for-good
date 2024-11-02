@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import { CurrencyDollarIcon } from "@heroicons/react/solid";
 import Cookies from 'js-cookie';
 import {useMixedContext} from "../../contextx/MixedContext.js";
+import {useDBContext} from "../../contextx/DBContext.js";
 
 export default function CreateSurveyModal({
     show,
@@ -14,7 +15,7 @@ export default function CreateSurveyModal({
 }) {
   
     const {  api,contract, signerAddress, sendTransaction,ReadContractByQuery,getMessage,getQuery,getTX } = useMixedContext();;
- 
+    const { CreateDescription}= useDBContext();
 
  
     async function CreateSurveyHandle(e) {
@@ -28,7 +29,8 @@ export default function CreateSurveyModal({
         surveyBTN.children[1].innerText = ""
         surveyBTN.disabled = true;
         try {
-            await sendTransaction( "CreateSurvey",[Number(Studyid),Cookies.get("userid"),name.value,description.value,d,image.value, window.WrapBigNum(reward.value)],window.WrapBigNum(reward.value));
+            let descriptionId = await CreateDescription(description.value);
+            await sendTransaction( "CreateSurvey",[Number(Studyid),Cookies.get("userid"),name.value,descriptionId,d,image.value, window.WrapBigNum(reward.value)],window.WrapBigNum(reward.value));
             
             notificationSuccess.style.display = "block";
             surveyBTN.children[0].classList.add("hidden")

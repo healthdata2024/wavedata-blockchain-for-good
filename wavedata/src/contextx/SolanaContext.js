@@ -67,6 +67,12 @@ export function SolanaProvider({ children }) {
 			case "UpdateAudience":
 				await UpdateAudience.apply(this, args);
 				break;
+			case "UpdateStudyAges":
+				await UpdateStudyAges.apply(this, args);
+				break;
+			case "CreateOrSaveStudyTitle":
+				await CreateOrSaveStudyTitle.apply(this, args);
+				break;
 			case "UpdateUser":
 				await UpdateUser.apply(this, args);
 				break;
@@ -374,8 +380,8 @@ export async function CreateStudy(userId, image, title, description, permission,
 		rewardType: "SOL",
 		rewardPrice: 0,
 		totalSpendingLimit: budget,
-		ages: "[]",
-		titles: "[]",
+		ages: "",
+		titles: "",
 	}
 	let _studyMap = db.map.get("_studyMap") !== undefined ? JSON.parse(db.map.get("_studyMap")) : [];
 	obj['studyId'] = _studyMap.length;
@@ -535,6 +541,28 @@ export async function UpdateAudience(studyId, audienceInfo) {
 
 }
 
+export async function UpdateStudyAges(studyId, agesInfo) {
+	let db = await getOutput();
+	let _studyMap = db.map.get("_studyMap") !== undefined ? JSON.parse(db.map.get("_studyMap")) : [];
+	for (let i = 0; i < _studyMap.length; i++) {
+		const element = _studyMap[i];
+		if (studyId === element.studyId) {
+			_studyMap[i].ages = agesInfo;
+		}
+	}
+	await UpdateOrInsertData('_studyMap', JSON.stringify(_studyMap));
+}
+export async function CreateOrSaveStudyTitle(studyId, titlesInfo) {
+	let db = await getOutput();
+	let _studyMap = db.map.get("_studyMap") !== undefined ? JSON.parse(db.map.get("_studyMap")) : [];
+	for (let i = 0; i < _studyMap.length; i++) {
+		const element = _studyMap[i];
+		if (studyId === element.studyId) {
+			_studyMap[i].titles = titlesInfo;
+		}
+	}
+	await UpdateOrInsertData('_studyMap', JSON.stringify(_studyMap));
+}
 export async function UpdateUser(userId, image, credits) {
 	let db = await getOutput();
 	let _userMap = db.map.get("_userMap") !== undefined ? JSON.parse(db.map.get("_userMap")) : [];

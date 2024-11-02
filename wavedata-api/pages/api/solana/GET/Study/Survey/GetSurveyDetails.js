@@ -5,6 +5,7 @@ export default async function handler(req, res) {
 	} catch (error) {}
 
 	let useContract = await import("../../../../../../contract/useContractSolana.js");
+	let {GetDescription} = await import("../../../../../../context/DBContext.js");
 	const {api,  signerAddress, sendTransaction, ReadContract} = await useContract.default();
 
 	let survey_element = await ReadContract(api, signerAddress, "_surveyMap", [Number(req.query.surveyid)]);
@@ -13,7 +14,7 @@ export default async function handler(req, res) {
 		study_id: Number(survey_element.studyId),
 		user_id: Number(survey_element.userId),
 		name: survey_element.name,
-		description: survey_element.description,
+		description: await GetDescription(survey_element.description),
 		date: survey_element.date,
 		image: survey_element.image,
 		reward: Number(survey_element.reward),
